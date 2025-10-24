@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Enhanced Business Analysis Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header/Hero Section */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 80px 20px;
+            text-align: center;
+            margin: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .hero-title {
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            font-size: 1.1em;
+            color: #777;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Projects Section */
+        .section {
+            background: white;
+            margin: 40px 20px;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #333;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 1.1em;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+
+        .project-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .project-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .project-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .project-metrics {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .metric-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .project-tech {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tech-tag {
+            background: rgba(118, 75, 162, 0.1);
+            color: #764ba2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .project-link {
+            padding: 8px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            border: 2px solid #667eea;
+        }
+
+        .project-link:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Skills Section */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .skill-category {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .skill-category h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .skill-list {
+            list-style: none;
+        }
+
+        .skill-list li {
+            padding: 8px 0;
+            color: #666;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .skill-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .about-text h3 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .about-text p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .highlight-box h4 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+        }
+
+        .highlight-box li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .highlight-box li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .contact-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .contact-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .contact-card a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 40px 20px 20px;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2em;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2em;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 20px;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card, .skill-category, .contact-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Call to Action Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .cta-banner h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .cta-banner p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header>
+        <div class="container">
+            <h1 class="hero-title">AI-Enhanced Business Analysis</h1>
+            <p class="hero-subtitle">Transforming Traditional BA Workflows with Artificial Intelligence</p>
+            <p class="hero-description">
+                I build AI-powered tools that make Business Analysts 10x more effective. 
+                Specializing in requirements automation, intelligent process mining, and 
+                stakeholder analysis—delivering 40-80% efficiency gains across BA workflows.
+            </p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">60%</div>
+                    <div class="stat-label">Time Saved</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">AI Tools Built</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">$36K</div>
+                    <div class="stat-label">Annual Value/BA</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Open Source</div>
+                </div>
+            </div>
+
+            <nav>
+                <a href="#projects" class="btn btn-primary">View Projects</a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <h2 class="section-title">Portfolio Projects</h2>
+            <p class="section-subtitle">AI-powered solutions for core Business Analysis workflows</p>
+
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card">
+                    <div class="project-icon">🤖</div>
+                    <h3 class="project-title">AI Requirements Extractor</h3>
+                    <p class="project-description">
+                        Automatically extracts and categorizes business requirements from unstructured 
+                        documents using GPT-4 and NLP. Transforms meeting notes, interviews, and specs 
+                        into structured, testable requirements.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric-badge">⚡ 60% Faster</span>
+                        <span class="metric-badge">✓ 92% Accuracy</span>
+                        <span class="metric-badge">📈 25% More Complete</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">Claude API</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">NLP</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">Live Demo</a>
+                        <a href="#" class="project-link">GitHub</a>
+                        <a href="#" class="project-link">Case Study</a>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card">
+                    <div class="project-icon">📊</div>
+                    <h3 class="project-title">Intelligent BI Dashboard</h3>
+                    <p class="project-description">
+                        Automated business intelligence platform that generates comprehensive data analysis 
+                        reports using machine learning. Identifies anomalies, trends, and actionable insights 
+                        90% faster than manual analysis.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric-badge">⚡ 90% Faster</span>
+                        <span class="metric-badge">📊 30% More Insights</span>
+                        <span class="metric-badge">🎯 85% Accuracy</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">Machine Learning</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Pandas</span>
+                        <span class="tech-tag">Plotly</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">Live Demo</a>
+                        <a href="#" class="project-link">GitHub</a>
+                        <a href="#" class="project-link">Case Study</a>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card">
+                    <div class="project-icon">🔄</div>
+                    <h3 class="project-title">Process Mining AI</h3>
+                    <p class="project-description">
+                        AI-powered process mining tool that identifies bottlenecks and optimization 
+                        opportunities. Analyzes event logs using ML algorithms to reduce cycle times 
+                        and improve efficiency.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric-badge">⚡ 80% Faster Analysis</span>
+                        <span class="metric-badge">📉 35% Cycle Time Cut</span>
+                        <span class="metric-badge">💰 $150K Savings</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">Process Mining</span>
+                        <span class="tech-tag">ML Algorithms</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Visualization</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">Live Demo</a>
+                        <a href="#" class="project-link">GitHub</a>
+                        <a href="#" class="project-link">Case Study</a>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card">
+                    <div class="project-icon">💬</div>
+                    <h3 class="project-title">Stakeholder Assistant</h3>
+                    <p class="project-description">
+                        Intelligent communication platform using sentiment analysis and NLP. Automates 
+                        meeting summarization, action item extraction, and risk detection from stakeholder 
+                        communications.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric-badge">⚡ 70% Time Saved</span>
+                        <span class="metric-badge">✓ 95% Accuracy</span>
+                        <span class="metric-badge">🎯 Zero Missed Items</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">Sentiment Analysis</span>
+                        <span class="tech-tag">NLP</span>
+                        <span class="tech-tag">LLMs</span>
+                        <span class="tech-tag">FastAPI</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">Live Demo</a>
+                        <a href="#" class="project-link">GitHub</a>
+                        <a href="#" class="project-link">Case Study</a>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card">
+                    <div class="project-icon">✅</div>
+                    <h3 class="project-title">Test Case Generator</h3>
+                    <p class="project-description">
+                        ML-powered test case generator that automatically creates comprehensive test 
+                        scenarios from requirements. Increases coverage and identifies edge cases that 
+                        manual testing often misses.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric-badge">⚡ 65% Faster</span>
+                        <span class="metric-badge">📈 92% Coverage</span>
+                        <span class="metric-badge">🐛 40% More Defects Found</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">ML Testing</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Test Automation</span>
+                        <span class="tech-tag">QA</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">Live Demo</a>
+                        <a href="#" class="project-link">GitHub</a>
+                        <a href="#" class="project-link">Case Study</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Technical Skills</h2>
+            <p class="section-subtitle">Combining traditional BA expertise with cutting-edge AI capabilities</p>
+
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3>Business Analysis</h3>
+                    <ul class="skill-list">
+                        <li>Requirements Engineering</li>
+                        <li>Process Modeling (BPMN)</li>
+                        <li>Stakeholder Management</li>
+                        <li>User Story Mapping</li>
+                        <li>Gap Analysis</li>
+                        <li>UAT Planning</li>
+                        <li>Agile/Scrum</li>
+                    </ul>
+                </div>
+
+                <div class="skill-category">
+                    <h3>AI & Machine Learning</h3>
+                    <ul class="skill-list">
+                        <li>Natural Language Processing</li>
+                        <li>GPT-4 & Claude APIs</li>
+                        <li>Predictive Analytics</li>
+                        <li>Sentiment Analysis</li>
+                        <li>Process Mining</li>
+                        <li>Anomaly Detection</li>
+                        <li>Entity Recognition</li>
+                    </ul>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Development & Tools</h3>
+                    <ul class="skill-list">
+                        <li>Python (Pandas, NumPy)</li>
+                        <li>React & JavaScript</li>
+                        <li>FastAPI & REST APIs</li>
+                        <li>SQL & Databases</li>
+                        <li>Git/GitHub</li>
+                        <li>Docker</li>
+                        <li>Cloud Services (AWS)</li>
+                    </ul>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Data & Analytics</h3>
+                    <ul class="skill-list">
+                        <li>Data Visualization</li>
+                        <li>Statistical Analysis</li>
+                        <li>Business Intelligence</li>
+                        <li>Tableau & Power BI</li>
+                        <li>Excel (Advanced)</li>
+                        <li>ETL Processes</li>
+                        <li>Report Automation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <p class="section-subtitle">Pioneering AI-enhanced Business Analysis</p>
+
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Transforming BA Workflows with AI</h3>
+                    <p>
+                        I'm a Business Analyst specializing in AI-powered process improvement. After years 
+                        of seeing analysts spend 30-40% of their time on repetitive, mechanical tasks, I asked: 
+                        "What if AI could handle these efficiently?"
+                    </p>
+                    <p>
+                        I built the first portfolio of AI tools specifically designed for BA workflows—not 
+                        general data science, but practical applications that directly address BA pain points 
+                        like requirements extraction, stakeholder analysis, and process mining.
+                    </p>
+                    <p>
+                        My approach combines traditional BA expertise with modern AI capabilities (GPT-4, 
+                        Claude, machine learning) to create solutions that make analysts 10x more effective 
+                        while maintaining the critical human elements of business judgment and strategy.
+                    </p>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Why This Matters</h4>
+                    <ul>
+                        <li>Business Analysts spend too much time on repetitive tasks</li>
+                        <li>AI can automate mechanical work with remarkable accuracy</li>
+                        <li>Saved time gets reallocated to strategic, high-value work</li>
+                        <li>The future of BA = Domain expertise + AI tools + Business acumen</li>
+                        <li>Zero portfolios like this existed before—I'm pioneering this space</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <div class="container">
+            <h2>Let's Build the Future of Business Analysis</h2>
+            <p>Interested in AI-enhanced BA workflows? Let's connect and collaborate.</p>
+            <nav>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+                <a href="#" class="btn btn-secondary">Download Resume</a>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <h2 class="section-title">Let's Connect</h2>
+            <p class="section-subtitle">Available for BA roles, consulting, or collaboration opportunities</p>
+
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email</h3>
+                    <a href="mailto:your.email@example.com">your.email@example.com</a>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">💼</div>
+                    <h3>LinkedIn</h3>
+                    <a href="https://linkedin.com/in/yourprofile" target="_blank">Connect on LinkedIn</a>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">💻</div>
+                    <h3>GitHub</h3>
+                    <a href="https://github.com/yourusername" target="_blank">View My Code</a>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">📱</div>
+                    <h3>Twitter</h3>
+                    <a href="https://twitter.com/yourhandle" target="_blank">Follow Me</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AI-Enhanced Business Analysis Portfolio. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Pioneering the integration of AI into Business Analysis workflows 🚀
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
