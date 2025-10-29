@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Requirements Extractor - Demo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        // Lucide icon components
+        const Upload = () => <i data-lucide="upload"></i>;
+        const FileText = () => <i data-lucide="file-text"></i>;
+        const Loader2 = () => <i data-lucide="loader-2"></i>;
+        const Download = () => <i data-lucide="download"></i>;
+        const Trash2 = () => <i data-lucide="trash-2"></i>;
+        const AlertCircle = () => <i data-lucide="alert-circle"></i>;
+        
+        function RequirementsExtractorDemo() {
+            const [input, setInput] = useState('');
+            const [extracting, setExtracting] = useState(false);
+            const [requirements, setRequirements] = useState([]);
+            const [stats, setStats] = useState(null);
+            const [activeTab, setActiveTab] = useState('input');
+            const [error, setError] = useState(null);
+
+            const sampleText = `Meeting Notes - E-Commerce Platform Requirements
+Date: October 21, 2025
+
+Discussion with stakeholders revealed several key requirements:
+
+1. The system must allow users to browse products by category and search using keywords. Response time should be under 2 seconds.
+
+2. Users need to be able to add items to shopping cart and checkout securely. Payment processing must comply with PCI DSS standards.
+
+3. The platform should send email notifications for order confirmations and shipping updates. Users mentioned they want to track their orders in real-time.
+
+4. Admin panel is needed for inventory management. Store managers should be able to update product details, prices, and stock levels.
+
+5. The system must support multiple payment methods including credit cards, PayPal, and digital wallets. All transactions must be encrypted.
+
+6. Performance requirement: The system should handle at least 1000 concurrent users during peak hours.
+
+7. Security: User passwords must be hashed using industry-standard algorithms. Two-factor authentication is required for admin accounts.
+
+8. The platform needs to integrate with existing shipping provider APIs (FedEx, UPS, USPS).`;
+
+            const loadSample = () => {
+                setInput(sampleText);
+                setActiveTab('input');
+                setError(null);
+            };
+
+            const clearAll = () => {
+                setInput('');
+                setRequirements([]);
+                setStats(null);
+                setError(null);
+                setActiveTab('input');
+            };
+
+            const extractRequirements = async () => {
+                if (!input.trim()) {
+                    setError('Please enter some text to analyze');
+                    return;
+                }
+
+                setExtracting(true);
+                setError(null);
+                setActiveTab('results');
+
+                try {
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-sonnet-4-20250514',
+                            max_tokens: 4000,
+                            messages: [{
+                                role: 'user',
+                                content: `You are an expert Business Analyst. Analyze the following text and extract ALL business requirements.
+
+TEXT TO ANALYZE:
+${input}
+
+For each requirement, provide:
+1. A clear, concise title
+2. Detailed description
+3. Type (functional, non_functional, business, technical, constraint)
+4. Category (specific area like authentication, payment, performance, etc.)
+5. Priority (critical, high, medium, low)
+6. Stakeholders involved
+7. Related systems/components
+8. Confidence score (0-100)
+
+CRITICAL: Return ONLY valid JSON with NO markdown formatting, NO backticks, NO preamble. Just the raw JSON object.
+
+Format:
+{
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "Brief title",
+      "description": "Detailed description",
+      "type": "functional",
+      "category": "category name",
+      "priority": "high",
+      "stakeholders": ["role1", "role2"],
+      "systems": ["system1"],
+      "confidence": 95
+    }
+  ]
+}`
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const content = data.content[0].text;
+                    
+                    let parsed;
+                    try {
+                        let cleanContent = content.trim();
+                        cleanContent = cleanContent.replace(/```json\n?/g, '');
+                        cleanContent = cleanContent.replace(/```\n?/g, '');
+                        cleanContent = cleanContent.trim();
+                        
+                        parsed = JSON.parse(cleanContent);
+                    } catch (e) {
+                        const jsonMatch = content.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            parsed = JSON.parse(jsonMatch[0]);
+                        } else {
+                            throw new Error('Could not parse response as JSON');
+                        }
+                    }
+
+                    const reqs = parsed.requirements || [];
+                    
+                    if (reqs.length === 0) {
+                        throw new Error('No requirements were extracted');
+                    }
+                    
+                    setRequirements(reqs);
+
+                    const typeCount = {};
+                    const priorityCount = {};
+                    let totalConfidence = 0;
+
+                    reqs.forEach(req => {
+                        typeCount[req.type] = (typeCount[req.type] || 0) + 1;
+                        priorityCount[req.priority] = (priorityCount[req.priority] || 0) + 1;
+                        totalConfidence += req.confidence;
+                    });
+
+                    setStats({
+                        total: reqs.length,
+                        byType: typeCount,
+                        byPriority: priorityCount,
+                        avgConfidence: Math.round(totalConfidence / reqs.length)
+                    });
+
+                    setError(null);
+
+                } catch (error) {
+                    const errorMessage = error.message || 'Unknown error occurred';
+                    setError(`Error: ${errorMessage}`);
+                    setRequirements([]);
+                    setStats(null);
+                    setActiveTab('input');
+                } finally {
+                    setExtracting(false);
+                }
+            };
+
+            const exportRequirements = () => {
+                const csv = [
+                    ['ID', 'Title', 'Description', 'Type', 'Category', 'Priority', 'Stakeholders', 'Systems', 'Confidence'],
+                    ...requirements.map(r => [
+                        r.id,
+                        r.title,
+                        r.description,
+                        r.type,
+                        r.category,
+                        r.priority,
+                        r.stakeholders.join('; '),
+                        r.systems.join('; '),
+                        r.confidence
+                    ])
+                ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'requirements.csv';
+                a.click();
+            };
+
+            const getTypeColor = (type) => {
+                const colors = {
+                    functional: 'bg-blue-100 text-blue-800 border-blue-300',
+                    non_functional: 'bg-purple-100 text-purple-800 border-purple-300',
+                    business: 'bg-green-100 text-green-800 border-green-300',
+                    technical: 'bg-orange-100 text-orange-800 border-orange-300',
+                    constraint: 'bg-red-100 text-red-800 border-red-300'
+                };
+                return colors[type] || 'bg-gray-100 text-gray-800 border-gray-300';
+            };
+
+            const getPriorityColor = (priority) => {
+                const colors = {
+                    critical: 'bg-red-500',
+                    high: 'bg-orange-500',
+                    medium: 'bg-yellow-500',
+                    low: 'bg-green-500'
+                };
+                return colors[priority] || 'bg-gray-500';
+            };
+
+            React.useEffect(() => {
+                lucide.createIcons();
+            });
+
+            return (
+                <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                        AI Requirements Extractor
+                                    </h1>
+                                    <p className="text-gray-600">
+                                        Automatically extract and categorize business requirements from any text
+                                    </p>
+                                </div>
+                                <FileText />
+                            </div>
+                            
+                            {error && (
+                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                                    <AlertCircle />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-red-800">Error</p>
+                                        <p className="text-sm text-red-700 mt-1">{error}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="bg-white rounded-lg shadow-lg mb-6">
+                            <div className="flex border-b">
+                                <button
+                                    onClick={() => setActiveTab('input')}
+                                    className={`px-6 py-3 font-medium transition-colors ${
+                                        activeTab === 'input'
+                                            ? 'border-b-2 border-blue-600 text-blue-600'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                >
+                                    Input Text
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('results')}
+                                    className={`px-6 py-3 font-medium transition-colors ${
+                                        activeTab === 'results'
+                                            ? 'border-b-2 border-blue-600 text-blue-600'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                >
+                                    Extracted Requirements {requirements.length > 0 && `(${requirements.length})`}
+                                </button>
+                                {stats && (
+                                    <button
+                                        onClick={() => setActiveTab('analytics')}
+                                        className={`px-6 py-3 font-medium transition-colors ${
+                                            activeTab === 'analytics'
+                                                ? 'border-b-2 border-blue-600 text-blue-600'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                        }`}
+                                    >
+                                        Analytics
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Input Tab */}
+                            {activeTab === 'input' && (
+                                <div className="p-6">
+                                    <div className="mb-4 flex gap-3 flex-wrap">
+                                        <button
+                                            onClick={loadSample}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
+                                        >
+                                            <FileText />
+                                            Load Sample Text
+                                        </button>
+                                        <button
+                                            onClick={clearAll}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-2"
+                                        >
+                                            <Trash2 />
+                                            Clear All
+                                        </button>
+                                        <div className="flex-1"></div>
+                                        <div className="text-sm text-gray-500 flex items-center">
+                                            {input.length} characters • {input.split(/\s+/).filter(w => w).length} words
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <p className="text-sm text-blue-800">
+                                            <strong>💡 Tip:</strong> Paste your meeting notes, interview transcripts, or requirements documents below. 
+                                            Or click "Load Sample Text" to try with example data.
+                                        </p>
+                                    </div>
+
+                                    <textarea
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        placeholder="Paste your meeting notes, interview transcripts, or requirements documents here..."
+                                        className="w-full h-96 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                                    />
+
+                                    <div className="mt-4 flex justify-end">
+                                        <button
+                                            onClick={extractRequirements}
+                                            disabled={extracting || !input.trim()}
+                                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+                                        >
+                                            {extracting ? (
+                                                <>
+                                                    <Loader2 />
+                                                    Extracting Requirements...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload />
+                                                    Extract Requirements
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Results Tab */}
+                            {activeTab === 'results' && (
+                                <div className="p-6">
+                                    {requirements.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <FileText />
+                                            <p className="text-gray-600 font-medium">No requirements extracted yet.</p>
+                                            <p className="text-sm text-gray-500 mt-2">Enter text in the Input tab and click "Extract Requirements" to begin.</p>
+                                            <button
+                                                onClick={() => setActiveTab('input')}
+                                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                Go to Input Tab
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex justify-between items-center mb-6">
+                                                <h2 className="text-xl font-semibold text-gray-900">
+                                                    Extracted Requirements ({requirements.length})
+                                                </h2>
+                                                <button
+                                                    onClick={exportRequirements}
+                                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                                                >
+                                                    <Download />
+                                                    Export CSV
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {requirements.map((req, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow bg-white"
+                                                    >
+                                                        <div className="flex items-start justify-between mb-3">
+                                                            <div className="flex-1">
+                                                                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                                                                        {req.id}
+                                                                    </span>
+                                                                    <span className={`text-xs px-2 py-1 rounded border ${getTypeColor(req.type)}`}>
+                                                                        {req.type.replace('_', ' ')}
+                                                                    </span>
+                                                                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                                                        {req.category}
+                                                                    </span>
+                                                                </div>
+                                                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                                                    {req.title}
+                                                                </h3>
+                                                                <p className="text-gray-700 mb-3">
+                                                                    {req.description}
+                                                                </p>
+                                                                <div className="flex flex-wrap gap-4 text-sm">
+                                                                    <div>
+                                                                        <span className="text-gray-500">Stakeholders:</span>
+                                                                        <span className="ml-2 text-gray-700">{req.stakeholders.join(', ')}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="text-gray-500">Systems:</span>
+                                                                        <span className="ml-2 text-gray-700">{req.systems.join(', ')}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col items-end gap-2 ml-4">
+                                                                <div className={`w-3 h-3 rounded-full ${getPriorityColor(req.priority)}`} title={req.priority}></div>
+                                                                <div className="text-xs text-gray-500">{req.confidence}% conf</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Analytics Tab */}
+                            {activeTab === 'analytics' && stats && (
+                                <div className="p-6">
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">Requirements Analytics</h2>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                            <div className="text-2xl font-bold text-blue-900">{stats.total}</div>
+                                            <div className="text-sm text-blue-700">Total Requirements</div>
+                                        </div>
+                                        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                            <div className="text-2xl font-bold text-green-900">{stats.avgConfidence}%</div>
+                                            <div className="text-sm text-green-700">Avg Confidence</div>
+                                        </div>
+                                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                            <div className="text-2xl font-bold text-purple-900">{Object.keys(stats.byType).length}</div>
+                                            <div className="text-sm text-purple-700">Requirement Types</div>
+                                        </div>
+                                        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                                            <div className="text-2xl font-bold text-orange-900">{stats.byPriority.critical || 0}</div>
+                                            <div className="text-sm text-orange-700">Critical Priority</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                                            <h3 className="font-semibold text-gray-900 mb-4">By Type</h3>
+                                            <div className="space-y-3">
+                                                {Object.entries(stats.byType).map(([type, count]) => (
+                                                    <div key={type}>
+                                                        <div className="flex justify-between text-sm mb-1">
+                                                            <span className="capitalize">{type.replace('_', ' ')}</span>
+                                                            <span className="font-medium">{count}</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div
+                                                                className="bg-blue-600 h-2 rounded-full"
+                                                                style={{ width: `${(count / stats.total) * 100}%` }}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                                            <h3 className="font-semibold text-gray-900 mb-4">By Priority</h3>
+                                            <div className="space-y-3">
+                                                {Object.entries(stats.byPriority).map(([priority, count]) => (
+                                                    <div key={priority}>
+                                                        <div className="flex justify-between text-sm mb-1">
+                                                            <span className="capitalize">{priority}</span>
+                                                            <span className="font-medium">{count}</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div
+                                                                className={`h-2 rounded-full ${getPriorityColor(priority)}`}
+                                                                style={{ width: `${(count / stats.total) * 100}%` }}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="text-center text-sm text-gray-600">
+                            <p>AI-Powered Requirements Extraction • Business Analysis Portfolio Project</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<RequirementsExtractorDemo />);
+        
+        // Initialize Lucide icons after render
+        setTimeout(() => {
+            lucide.createIcons();
+        }, 100);
+    </script>
+</body>
+</html>
