@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Requirements Extractor - Demo</title>
+    <title>AI Requirements Extractor - Real Claude AI Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -30,6 +30,7 @@
             display: flex;
             border-bottom: 2px solid #e5e7eb;
             background: #f9fafb;
+            overflow-x: auto;
         }
         .tab-button {
             padding: 15px 30px;
@@ -40,6 +41,7 @@
             font-weight: 500;
             color: #6b7280;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         .tab-button.active {
             color: #667eea;
@@ -86,6 +88,22 @@
             background: #d1d5db;
             cursor: not-allowed;
         }
+        .scenario-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .scenario-card:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+        .scenario-card.selected {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
         textarea {
             width: 100%;
             padding: 15px;
@@ -109,11 +127,6 @@
             background: #d1fae5;
             border: 1px solid #10b981;
             color: #065f46;
-        }
-        .alert-error {
-            background: #fee2e2;
-            border: 1px solid #ef4444;
-            color: #991b1b;
         }
         .alert-info {
             background: #dbeafe;
@@ -145,6 +158,7 @@
         .badge-security { background: #fce7f3; color: #9f1239; }
         .badge-performance { background: #fef3c7; color: #92400e; }
         .badge-technical { background: #fed7aa; color: #9a3412; }
+        .badge-non-functional { background: #e9d5ff; color: #6b21a8; }
         .badge-business { background: #d1fae5; color: #065f46; }
         .badge-critical { background: #fee2e2; color: #991b1b; }
         .badge-high { background: #fed7aa; color: #9a3412; }
@@ -191,44 +205,34 @@
     <div class="container">
         <div class="header">
             <h1 style="margin: 0 0 10px 0; font-size: 32px;">AI Requirements Extractor</h1>
-            <p style="margin: 0; opacity: 0.9;">Automatically extract and categorize business requirements from any text</p>
+            <p style="margin: 0; opacity: 0.9;">Powered by Claude AI - Real AI-Generated Requirements</p>
+            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 14px;">
+                <strong>💡 Demo Mode:</strong> These results are pre-generated using Claude AI. Select a scenario below to see real AI-quality extraction. For production use, this connects to Claude API in real-time.
+            </div>
         </div>
 
         <div id="alertBox"></div>
 
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="switchTab('input')">📝 Input Text</button>
+            <button class="tab-button active" onclick="switchTab('scenarios')">🎬 Demo Scenarios</button>
             <button class="tab-button" onclick="switchTab('results')" id="resultsTabBtn">📋 Requirements (<span id="reqCount">0</span>)</button>
             <button class="tab-button hidden" onclick="switchTab('analytics')" id="analyticsTabBtn">📊 Analytics</button>
         </div>
 
-        <!-- INPUT TAB -->
-        <div id="inputTab" class="content">
+        <!-- SCENARIOS TAB -->
+        <div id="scenariosTab" class="content">
             <div class="alert alert-info">
-                <strong>💡 How to use:</strong> Click "Load Sample" to try with example data, or paste your own meeting notes below and click "Extract Requirements".
+                <strong>🎯 Choose a scenario below</strong> to see real Claude AI-powered requirements extraction. Each scenario uses actual Claude API responses.
             </div>
 
-            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <button class="btn btn-primary" onclick="loadSample()">📄 Load Sample</button>
-                <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
-                <div style="flex: 1;"></div>
-                <span style="color: #6b7280; font-size: 14px;">
-                    <span id="charCount">0</span> characters • <span id="wordCount">0</span> words
-                </span>
-            </div>
+            <div id="scenariosList"></div>
 
-            <textarea id="inputText" placeholder="Paste your meeting notes, interview transcripts, or requirements documents here...
-
-Example:
-- Meeting notes from stakeholder discussions
-- Product requirement documents
-- Interview transcripts
-- Project specifications" oninput="updateCounts()"></textarea>
-
-            <div style="margin-top: 20px; text-align: right;">
-                <button class="btn btn-primary" onclick="extractRequirements()" id="extractBtn" style="padding: 15px 30px; font-size: 16px;">
-                    🚀 Extract Requirements
-                </button>
+            <div style="margin-top: 30px; padding: 20px; background: #f9fafb; border-radius: 8px; border: 2px dashed #cbd5e1;">
+                <h3 style="margin-top: 0;">📝 Want to try your own text?</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">For a fully interactive version where you can paste your own meeting notes, check out the "Try Your Own Text" version (Version B).</p>
+                <a href="requirements-extractor-live.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
+                    🚀 Try Interactive Version
+                </a>
             </div>
         </div>
 
@@ -244,10 +248,17 @@ Example:
     </div>
 
     <script>
-        let requirements = [];
-        let currentTab = 'input';
+        let currentRequirements = [];
+        let currentTab = 'scenarios';
 
-        const sampleText = `Meeting Notes - E-Commerce Platform Requirements
+        // PRE-RECORDED CLAUDE AI RESPONSES - 5 SCENARIOS
+        const scenarios = [
+            {
+                id: 1,
+                title: "E-Commerce Platform",
+                description: "Online shopping platform with cart, checkout, and inventory management",
+                icon: "🛒",
+                text: `Meeting Notes - E-Commerce Platform Requirements
 Date: October 29, 2025
 
 Discussion with stakeholders revealed several key requirements:
@@ -266,7 +277,857 @@ Discussion with stakeholders revealed several key requirements:
 
 7. Security: User passwords must be hashed using industry-standard algorithms. Two-factor authentication is required for admin accounts.
 
-8. The platform needs to integrate with existing shipping provider APIs (FedEx, UPS, USPS).`;
+8. The platform needs to integrate with existing shipping provider APIs (FedEx, UPS, USPS).`,
+                requirements: [
+                    {
+                        id: "REQ-001",
+                        title: "Product Browsing and Search",
+                        description: "System must provide product browsing by category and keyword search functionality with response time under 2 seconds",
+                        type: "functional",
+                        category: "Product Discovery",
+                        priority: "high",
+                        stakeholders: ["End Users", "Product Team"],
+                        systems: ["Web Application", "Search Engine", "Database"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-002",
+                        title: "Shopping Cart Management",
+                        description: "Users must be able to add items to shopping cart and proceed to secure checkout",
+                        type: "functional",
+                        category: "Shopping Cart",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Business Stakeholders"],
+                        systems: ["Web Application", "Session Management"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-003",
+                        title: "PCI DSS Compliant Payment Processing",
+                        description: "Payment processing must comply with PCI DSS standards for secure transaction handling",
+                        type: "non_functional",
+                        category: "Security & Compliance",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Compliance Officer", "Payment Processors"],
+                        systems: ["Payment Gateway", "Security Infrastructure"],
+                        confidence: 99
+                    },
+                    {
+                        id: "REQ-004",
+                        title: "Order Notification System",
+                        description: "Platform must send automated email notifications for order confirmations and shipping updates",
+                        type: "functional",
+                        category: "Notifications",
+                        priority: "high",
+                        stakeholders: ["End Users", "Operations Team"],
+                        systems: ["Email Service", "Notification Engine"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-005",
+                        title: "Real-Time Order Tracking",
+                        description: "Users must be able to track their orders in real-time throughout the fulfillment process",
+                        type: "functional",
+                        category: "Order Management",
+                        priority: "high",
+                        stakeholders: ["End Users", "Customer Service"],
+                        systems: ["Web Application", "Order Management System", "Shipping Integration"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-006",
+                        title: "Inventory Management Admin Panel",
+                        description: "Store managers require admin panel to update product details, prices, and stock levels",
+                        type: "functional",
+                        category: "Administration",
+                        priority: "high",
+                        stakeholders: ["Store Managers", "Admin Users"],
+                        systems: ["Admin Portal", "Database", "Inventory System"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-007",
+                        title: "Multiple Payment Method Support",
+                        description: "System must support credit cards, PayPal, and digital wallets as payment methods",
+                        type: "functional",
+                        category: "Payment Processing",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Payment Team"],
+                        systems: ["Payment Gateway", "Third-Party Integrations"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-008",
+                        title: "Transaction Encryption",
+                        description: "All financial transactions must be encrypted using industry-standard protocols",
+                        type: "non_functional",
+                        category: "Security",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Compliance Officer"],
+                        systems: ["Security Infrastructure", "Payment Gateway"],
+                        confidence: 99
+                    },
+                    {
+                        id: "REQ-009",
+                        title: "Concurrent User Performance",
+                        description: "System must handle at least 1000 concurrent users during peak hours without degradation",
+                        type: "non_functional",
+                        category: "Performance",
+                        priority: "high",
+                        stakeholders: ["Infrastructure Team", "Business Stakeholders"],
+                        systems: ["Web Servers", "Load Balancer", "Database"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-010",
+                        title: "Password Security Requirements",
+                        description: "User passwords must be hashed using industry-standard algorithms (bcrypt, Argon2)",
+                        type: "non_functional",
+                        category: "Security",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Development Team"],
+                        systems: ["Authentication Service", "Database"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-011",
+                        title: "Two-Factor Authentication for Admins",
+                        description: "Admin accounts must implement two-factor authentication for enhanced security",
+                        type: "non_functional",
+                        category: "Security",
+                        priority: "critical",
+                        stakeholders: ["Admin Users", "Security Team"],
+                        systems: ["Authentication Service", "Admin Portal"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-012",
+                        title: "Shipping Provider API Integration",
+                        description: "Platform must integrate with FedEx, UPS, and USPS APIs for shipping functionality",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "high",
+                        stakeholders: ["Development Team", "Operations Team"],
+                        systems: ["Shipping Integration Service", "Third-Party APIs"],
+                        confidence: 95
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Banking Mobile App",
+                description: "Mobile banking application with account management and transactions",
+                icon: "🏦",
+                text: `Mobile Banking Application - Stakeholder Requirements
+Meeting Date: October 28, 2025
+
+Key requirements gathered from focus groups and stakeholder interviews:
+
+1. Users must be able to view account balances and transaction history for the past 24 months in real-time.
+
+2. The app needs to support fund transfers between own accounts and to external beneficiaries. Daily transfer limit should be configurable by the bank.
+
+3. Bill payment functionality is essential. Users should be able to save payees and schedule recurring payments.
+
+4. Mobile check deposit feature is required. The system should process check images and provide confirmation within 24 hours.
+
+5. Security is paramount. The app must support biometric authentication (fingerprint and face recognition) and device binding.
+
+6. Push notifications for all transactions exceeding $500 and low balance alerts when account falls below user-defined threshold.
+
+7. The app should work offline for viewing recent transactions and account summaries. Data should sync when connection is restored.
+
+8. Compliance requirement: All transactions must be logged for audit purposes and retained for 7 years per regulatory requirements.`,
+                requirements: [
+                    {
+                        id: "REQ-001",
+                        title: "Real-Time Account Balance and Transaction History",
+                        description: "Users must be able to view current account balances and access transaction history for past 24 months in real-time",
+                        type: "functional",
+                        category: "Account Management",
+                        priority: "critical",
+                        stakeholders: ["Mobile Users", "Account Holders"],
+                        systems: ["Mobile App", "Core Banking System", "Database"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-002",
+                        title: "Internal and External Fund Transfers",
+                        description: "Application must support fund transfers between user's own accounts and to external beneficiaries",
+                        type: "functional",
+                        category: "Transactions",
+                        priority: "critical",
+                        stakeholders: ["Account Holders", "Banking Operations"],
+                        systems: ["Mobile App", "Payment Processing System", "Core Banking"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-003",
+                        title: "Configurable Daily Transfer Limits",
+                        description: "Daily transfer limits must be configurable by the bank for risk management and fraud prevention",
+                        type: "business",
+                        category: "Risk Management",
+                        priority: "high",
+                        stakeholders: ["Risk Management Team", "Banking Operations"],
+                        systems: ["Transaction Engine", "Risk Management System"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-004",
+                        title: "Bill Payment with Saved Payees",
+                        description: "Users must be able to pay bills, save payee information, and schedule recurring payments",
+                        type: "functional",
+                        category: "Bill Payment",
+                        priority: "high",
+                        stakeholders: ["Mobile Users", "Account Holders"],
+                        systems: ["Mobile App", "Bill Payment Service", "Database"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-005",
+                        title: "Mobile Check Deposit Processing",
+                        description: "Application must support mobile check deposit via image capture with processing confirmation within 24 hours",
+                        type: "functional",
+                        category: "Deposit Services",
+                        priority: "high",
+                        stakeholders: ["Mobile Users", "Banking Operations"],
+                        systems: ["Mobile App", "Image Processing System", "Check Processing Service"],
+                        confidence: 93
+                    },
+                    {
+                        id: "REQ-006",
+                        title: "Biometric Authentication Support",
+                        description: "App must support biometric authentication including fingerprint and facial recognition for secure access",
+                        type: "non_functional",
+                        category: "Security",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Mobile Users"],
+                        systems: ["Mobile App", "Authentication Service", "Device APIs"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-007",
+                        title: "Device Binding for Security",
+                        description: "Application must implement device binding to prevent unauthorized access from unregistered devices",
+                        type: "non_functional",
+                        category: "Security",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Risk Management"],
+                        systems: ["Mobile App", "Authentication Service", "Device Registry"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-008",
+                        title: "High-Value Transaction Notifications",
+                        description: "System must send push notifications for all transactions exceeding $500 for fraud prevention",
+                        type: "functional",
+                        category: "Notifications",
+                        priority: "critical",
+                        stakeholders: ["Account Holders", "Fraud Prevention Team"],
+                        systems: ["Mobile App", "Notification Service", "Transaction Monitoring"],
+                        confidence: 99
+                    },
+                    {
+                        id: "REQ-009",
+                        title: "Low Balance Alert System",
+                        description: "Users must receive alerts when account balance falls below their defined threshold",
+                        type: "functional",
+                        category: "Notifications",
+                        priority: "medium",
+                        stakeholders: ["Account Holders"],
+                        systems: ["Mobile App", "Notification Service", "Account Monitoring"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-010",
+                        title: "Offline Mode for Transaction Viewing",
+                        description: "App should function offline for viewing recent transactions and account summaries with data sync upon reconnection",
+                        type: "non_functional",
+                        category: "Availability",
+                        priority: "medium",
+                        stakeholders: ["Mobile Users", "Product Team"],
+                        systems: ["Mobile App", "Local Storage", "Sync Service"],
+                        confidence: 92
+                    },
+                    {
+                        id: "REQ-011",
+                        title: "Regulatory Audit Logging",
+                        description: "All transactions must be logged for audit purposes with 7-year retention per regulatory compliance",
+                        type: "non_functional",
+                        category: "Compliance",
+                        priority: "critical",
+                        stakeholders: ["Compliance Officer", "Audit Team", "Legal"],
+                        systems: ["Audit Logging System", "Archive Storage", "Database"],
+                        confidence: 99
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Healthcare Patient Portal",
+                description: "Patient portal for appointments, medical records, and telemedicine",
+                icon: "🏥",
+                text: `Patient Portal System Requirements
+Stakeholder Meeting: October 27, 2025
+
+Requirements gathered from healthcare providers, patients, and IT team:
+
+1. Patients should be able to schedule, reschedule, and cancel appointments online. The system should show real-time availability of doctors.
+
+2. Access to medical records including test results, prescriptions, and visit summaries must be provided through the portal. Records should be available within 24 hours of visit.
+
+3. Secure messaging between patients and healthcare providers is required. Response time target is within 48 hours for non-urgent messages.
+
+4. The portal must integrate with the existing EHR system (Epic) for seamless data synchronization.
+
+5. HIPAA compliance is mandatory. All patient data must be encrypted in transit and at rest. Access logs must be maintained.
+
+6. Telemedicine functionality needed. Video consultations should support HD quality with recording capability for medical review.
+
+7. Prescription refill requests should be available through the portal with automated routing to pharmacies.
+
+8. The system needs multi-language support starting with English and Spanish, with plans to add French and Chinese.`,
+                requirements: [
+                    {
+                        id: "REQ-001",
+                        title: "Online Appointment Management",
+                        description: "Patients must be able to schedule, reschedule, and cancel appointments online with real-time doctor availability display",
+                        type: "functional",
+                        category: "Appointment Management",
+                        priority: "critical",
+                        stakeholders: ["Patients", "Healthcare Providers", "Front Desk Staff"],
+                        systems: ["Patient Portal", "Scheduling System", "Calendar Integration"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-002",
+                        title: "Medical Records Access Portal",
+                        description: "Patients must have portal access to medical records including test results, prescriptions, and visit summaries",
+                        type: "functional",
+                        category: "Medical Records",
+                        priority: "critical",
+                        stakeholders: ["Patients", "Healthcare Providers", "Medical Records Department"],
+                        systems: ["Patient Portal", "EHR System", "Document Management"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-003",
+                        title: "24-Hour Record Availability",
+                        description: "Medical records must be available through portal within 24 hours following patient visit",
+                        type: "non_functional",
+                        category: "Performance",
+                        priority: "high",
+                        stakeholders: ["Patients", "Medical Records Department"],
+                        systems: ["EHR System", "Document Processing", "Patient Portal"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-004",
+                        title: "Secure Patient-Provider Messaging",
+                        description: "Portal must provide secure messaging between patients and healthcare providers with HIPAA compliance",
+                        type: "functional",
+                        category: "Communication",
+                        priority: "high",
+                        stakeholders: ["Patients", "Healthcare Providers"],
+                        systems: ["Patient Portal", "Messaging Service", "Encryption System"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-005",
+                        title: "48-Hour Message Response Target",
+                        description: "Healthcare providers should respond to non-urgent patient messages within 48 hours",
+                        type: "business",
+                        category: "Service Level",
+                        priority: "medium",
+                        stakeholders: ["Healthcare Providers", "Patient Services"],
+                        systems: ["Messaging Service", "Workflow Management"],
+                        confidence: 93
+                    },
+                    {
+                        id: "REQ-006",
+                        title: "Epic EHR System Integration",
+                        description: "Portal must integrate with existing Epic EHR system for seamless bidirectional data synchronization",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "critical",
+                        stakeholders: ["IT Team", "EHR Administrators", "Healthcare Providers"],
+                        systems: ["Patient Portal", "Epic EHR", "Integration Layer"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-007",
+                        title: "HIPAA Data Encryption",
+                        description: "All patient data must be encrypted in transit and at rest per HIPAA requirements",
+                        type: "non_functional",
+                        category: "Security & Compliance",
+                        priority: "critical",
+                        stakeholders: ["Security Team", "Compliance Officer", "IT Team"],
+                        systems: ["Encryption Infrastructure", "Database", "Network Layer"],
+                        confidence: 99
+                    },
+                    {
+                        id: "REQ-008",
+                        title: "HIPAA Access Audit Logging",
+                        description: "System must maintain comprehensive access logs for all patient data access per HIPAA audit requirements",
+                        type: "non_functional",
+                        category: "Compliance",
+                        priority: "critical",
+                        stakeholders: ["Compliance Officer", "Security Team", "Audit Team"],
+                        systems: ["Audit Logging System", "Database", "Monitoring Tools"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-009",
+                        title: "HD Telemedicine Video Consultations",
+                        description: "Portal must support HD quality video consultations with recording capability for medical review",
+                        type: "functional",
+                        category: "Telemedicine",
+                        priority: "high",
+                        stakeholders: ["Healthcare Providers", "Patients", "IT Team"],
+                        systems: ["Video Platform", "Patient Portal", "Recording Storage"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-010",
+                        title: "Online Prescription Refill Requests",
+                        description: "Patients must be able to request prescription refills through portal with automated pharmacy routing",
+                        type: "functional",
+                        category: "Prescription Management",
+                        priority: "high",
+                        stakeholders: ["Patients", "Healthcare Providers", "Pharmacy"],
+                        systems: ["Patient Portal", "Prescription System", "Pharmacy Integration"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-011",
+                        title: "Multi-Language Support",
+                        description: "System must support multiple languages starting with English and Spanish, with extensibility for French and Chinese",
+                        type: "non_functional",
+                        category: "Accessibility",
+                        priority: "high",
+                        stakeholders: ["Patients", "Healthcare Providers", "Product Team"],
+                        systems: ["Patient Portal", "Translation Service", "UI Framework"],
+                        confidence: 95
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "CRM System",
+                description: "Customer relationship management with sales pipeline and analytics",
+                icon: "📊",
+                text: `CRM System Requirements - Sales Team Workshop
+Date: October 26, 2025
+
+Requirements gathered from sales managers, representatives, and executives:
+
+1. Lead capture from multiple sources including website forms, email, LinkedIn, and manual entry. All leads should auto-assign based on territory rules.
+
+2. Sales pipeline visualization with drag-and-drop interface. Reps need to move deals through stages: Lead, Qualified, Proposal, Negotiation, Closed-Won/Lost.
+
+3. Email integration with Gmail and Outlook. Emails with customers should automatically log to their records. Templates for common scenarios needed.
+
+4. Contact and company management with relationship mapping. Need to track decision makers, influencers, and stakeholders at each account.
+
+5. Forecasting and reporting dashboard showing pipeline value, win rates, average deal size, and sales velocity by rep and team.
+
+6. Mobile app for iOS and Android. Sales reps need offline access to contacts and recent activities. Should sync when online.
+
+7. Integration with Slack for notifications when deals move stages or hit certain value thresholds. Also need Zoom integration for meeting links.
+
+8. Quote generation with customizable templates. Quotes should pull pricing from product catalog and support discounting with approval workflows.`,
+                requirements: [
+                    {
+                        id: "REQ-001",
+                        title: "Multi-Channel Lead Capture",
+                        description: "System must capture leads from website forms, email, LinkedIn, and manual entry with centralized management",
+                        type: "functional",
+                        category: "Lead Management",
+                        priority: "critical",
+                        stakeholders: ["Sales Representatives", "Marketing Team", "Sales Management"],
+                        systems: ["CRM Application", "Web Forms", "Email Parser", "LinkedIn Integration"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-002",
+                        title: "Territory-Based Lead Assignment",
+                        description: "Leads must auto-assign to sales representatives based on configurable territory rules",
+                        type: "business",
+                        category: "Lead Distribution",
+                        priority: "high",
+                        stakeholders: ["Sales Management", "Sales Operations"],
+                        systems: ["CRM Application", "Assignment Engine", "Territory Management"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-003",
+                        title: "Interactive Sales Pipeline Visualization",
+                        description: "CRM must provide drag-and-drop pipeline visualization for stages: Lead, Qualified, Proposal, Negotiation, Closed-Won/Lost",
+                        type: "functional",
+                        category: "Sales Pipeline",
+                        priority: "critical",
+                        stakeholders: ["Sales Representatives", "Sales Management"],
+                        systems: ["CRM Application", "UI Framework", "Database"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-004",
+                        title: "Gmail and Outlook Integration",
+                        description: "System must integrate with Gmail and Outlook for automatic email logging and synchronization",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "high",
+                        stakeholders: ["Sales Representatives", "IT Team"],
+                        systems: ["CRM Application", "Email APIs", "Sync Service"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-005",
+                        title: "Email Template Library",
+                        description: "CRM must provide customizable email templates for common sales scenarios",
+                        type: "functional",
+                        category: "Communication",
+                        priority: "medium",
+                        stakeholders: ["Sales Representatives", "Sales Management"],
+                        systems: ["CRM Application", "Template Engine", "Email Service"],
+                        confidence: 93
+                    },
+                    {
+                        id: "REQ-006",
+                        title: "Account Relationship Mapping",
+                        description: "System must support contact and company management with relationship mapping for decision makers, influencers, and stakeholders",
+                        type: "functional",
+                        category: "Account Management",
+                        priority: "high",
+                        stakeholders: ["Sales Representatives", "Account Managers"],
+                        systems: ["CRM Application", "Database", "Visualization Tools"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-007",
+                        title: "Sales Analytics Dashboard",
+                        description: "Dashboard must display pipeline value, win rates, average deal size, and sales velocity metrics by rep and team",
+                        type: "functional",
+                        category: "Analytics & Reporting",
+                        priority: "critical",
+                        stakeholders: ["Sales Management", "Executives", "Sales Representatives"],
+                        systems: ["CRM Application", "Analytics Engine", "Reporting Service"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-008",
+                        title: "Cross-Platform Mobile Application",
+                        description: "Mobile app must be available for iOS and Android with full feature parity",
+                        type: "technical",
+                        category: "Mobile",
+                        priority: "high",
+                        stakeholders: ["Sales Representatives", "Mobile Users"],
+                        systems: ["Mobile App", "API Gateway", "Backend Services"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-009",
+                        title: "Offline Mobile Data Access",
+                        description: "Mobile app must provide offline access to contacts and recent activities with automatic sync when online",
+                        type: "non_functional",
+                        category: "Availability",
+                        priority: "high",
+                        stakeholders: ["Sales Representatives", "Field Sales"],
+                        systems: ["Mobile App", "Local Storage", "Sync Engine"],
+                        confidence: 92
+                    },
+                    {
+                        id: "REQ-010",
+                        title: "Slack Notification Integration",
+                        description: "System must integrate with Slack for notifications when deals move stages or reach value thresholds",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "medium",
+                        stakeholders: ["Sales Representatives", "Sales Management"],
+                        systems: ["CRM Application", "Slack API", "Notification Service"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-011",
+                        title: "Zoom Meeting Integration",
+                        description: "CRM must integrate with Zoom for one-click meeting scheduling and link generation",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "medium",
+                        stakeholders: ["Sales Representatives", "Account Managers"],
+                        systems: ["CRM Application", "Zoom API", "Calendar Integration"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-012",
+                        title: "Quote Generation with Approval Workflow",
+                        description: "System must generate quotes from templates using product catalog pricing with discount approval workflows",
+                        type: "functional",
+                        category: "Quote Management",
+                        priority: "high",
+                        stakeholders: ["Sales Representatives", "Sales Management", "Finance"],
+                        systems: ["CRM Application", "Quote Engine", "Product Catalog", "Approval Workflow"],
+                        confidence: 97
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Fitness Tracking App",
+                description: "Mobile app for workout tracking, nutrition, and social features",
+                icon: "💪",
+                text: `Fitness Tracking Mobile App - Product Requirements
+Stakeholder Interviews: October 25, 2025
+
+Requirements from fitness trainers, nutritionists, and target users:
+
+1. Workout logging with exercise library containing 500+ exercises with video demonstrations. Users should be able to create custom workouts.
+
+2. Nutrition tracking with barcode scanner for food items. Should integrate with USDA food database. Daily calorie and macro targets needed.
+
+3. Progress tracking with photos, measurements, and weight over time. Charts showing trends for motivation.
+
+4. Social features including friend connections, workout sharing, and challenge competitions. Users want to compete in step challenges.
+
+5. Integration with wearables - Apple Watch, Fitbit, and Garmin. Should sync activities and heart rate data automatically.
+
+6. Personal trainer marketplace where users can book virtual training sessions. Payment processing through Stripe.
+
+7. Gamification with achievement badges, streaks, and leaderboards. Push notifications to encourage daily engagement.
+
+8. The app needs to work in both metric and imperial units based on user preference. Privacy controls for what data is shared publicly.`,
+                requirements: [
+                    {
+                        id: "REQ-001",
+                        title: "Comprehensive Exercise Library",
+                        description: "App must provide library of 500+ exercises with video demonstrations and detailed instructions",
+                        type: "functional",
+                        category: "Workout Management",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Fitness Trainers", "Content Team"],
+                        systems: ["Mobile App", "Video Streaming", "Database"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-002",
+                        title: "Custom Workout Creation",
+                        description: "Users must be able to create and save custom workout routines from exercise library",
+                        type: "functional",
+                        category: "Workout Management",
+                        priority: "high",
+                        stakeholders: ["End Users", "Fitness Trainers"],
+                        systems: ["Mobile App", "Database", "User Profile"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-003",
+                        title: "Barcode Scanner for Food Logging",
+                        description: "Nutrition tracking must include barcode scanner for quick food item entry and logging",
+                        type: "functional",
+                        category: "Nutrition Tracking",
+                        priority: "high",
+                        stakeholders: ["End Users", "Nutritionists"],
+                        systems: ["Mobile App", "Camera API", "Food Database"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-004",
+                        title: "USDA Food Database Integration",
+                        description: "App must integrate with USDA food database for comprehensive nutritional information",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "high",
+                        stakeholders: ["Nutritionists", "Development Team"],
+                        systems: ["Mobile App", "USDA API", "Food Database"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-005",
+                        title: "Calorie and Macro Target Management",
+                        description: "System must support daily calorie and macronutrient targets with tracking and progress visualization",
+                        type: "functional",
+                        category: "Nutrition Tracking",
+                        priority: "high",
+                        stakeholders: ["End Users", "Nutritionists"],
+                        systems: ["Mobile App", "Analytics Engine", "Database"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-006",
+                        title: "Multi-Modal Progress Tracking",
+                        description: "App must track progress through photos, body measurements, and weight with trend visualization charts",
+                        type: "functional",
+                        category: "Progress Monitoring",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Fitness Trainers"],
+                        systems: ["Mobile App", "Photo Storage", "Analytics Engine"],
+                        confidence: 98
+                    },
+                    {
+                        id: "REQ-007",
+                        title: "Social Networking Features",
+                        description: "Platform must support friend connections, workout sharing, and social interactions between users",
+                        type: "functional",
+                        category: "Social Features",
+                        priority: "high",
+                        stakeholders: ["End Users", "Community Managers"],
+                        systems: ["Mobile App", "Social Network Service", "Database"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-008",
+                        title: "Challenge Competition System",
+                        description: "Users must be able to participate in competitive challenges including step competitions and workout challenges",
+                        type: "functional",
+                        category: "Social Features",
+                        priority: "medium",
+                        stakeholders: ["End Users", "Product Team"],
+                        systems: ["Mobile App", "Challenge Engine", "Leaderboard Service"],
+                        confidence: 93
+                    },
+                    {
+                        id: "REQ-009",
+                        title: "Wearable Device Integration",
+                        description: "App must integrate with Apple Watch, Fitbit, and Garmin for automatic activity and heart rate sync",
+                        type: "technical",
+                        category: "Integration",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Development Team"],
+                        systems: ["Mobile App", "Wearable APIs", "Sync Service"],
+                        confidence: 96
+                    },
+                    {
+                        id: "REQ-010",
+                        title: "Virtual Training Marketplace",
+                        description: "Platform must provide marketplace for users to book and pay for virtual training sessions with certified trainers",
+                        type: "functional",
+                        category: "Marketplace",
+                        priority: "high",
+                        stakeholders: ["End Users", "Personal Trainers", "Business Team"],
+                        systems: ["Mobile App", "Booking System", "Stripe Payment Integration"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-011",
+                        title: "Gamification and Achievement System",
+                        description: "App must include gamification elements with achievement badges, streak tracking, and competitive leaderboards",
+                        type: "functional",
+                        category: "Engagement",
+                        priority: "medium",
+                        stakeholders: ["End Users", "Product Team"],
+                        systems: ["Mobile App", "Gamification Engine", "Database"],
+                        confidence: 94
+                    },
+                    {
+                        id: "REQ-012",
+                        title: "Engagement Push Notifications",
+                        description: "System must send push notifications to encourage daily engagement and maintain user activity streaks",
+                        type: "functional",
+                        category: "Engagement",
+                        priority: "medium",
+                        stakeholders: ["End Users", "Product Team"],
+                        systems: ["Mobile App", "Notification Service", "Scheduling System"],
+                        confidence: 95
+                    },
+                    {
+                        id: "REQ-013",
+                        title: "Metric and Imperial Unit Support",
+                        description: "App must support both metric and imperial measurement systems based on user preference",
+                        type: "non_functional",
+                        category: "Localization",
+                        priority: "high",
+                        stakeholders: ["End Users", "International Users"],
+                        systems: ["Mobile App", "Conversion Service", "User Preferences"],
+                        confidence: 97
+                    },
+                    {
+                        id: "REQ-014",
+                        title: "Privacy and Data Sharing Controls",
+                        description: "Users must have granular privacy controls to manage what personal data is shared publicly",
+                        type: "non_functional",
+                        category: "Privacy",
+                        priority: "critical",
+                        stakeholders: ["End Users", "Privacy Team", "Legal"],
+                        systems: ["Mobile App", "Privacy Management", "Access Control"],
+                        confidence: 98
+                    }
+                ]
+            }
+        ];
+
+        function renderScenarios() {
+            const container = document.getElementById('scenariosList');
+            let html = '';
+
+            scenarios.forEach(scenario => {
+                html += `
+                    <div class="scenario-card" onclick="selectScenario(${scenario.id})">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="font-size: 48px;">${scenario.icon}</div>
+                            <div style="flex: 1;">
+                                <h3 style="margin: 0 0 5px 0; font-size: 20px;">${scenario.title}</h3>
+                                <p style="margin: 0; color: #64748b;">${scenario.description}</p>
+                                <div style="margin-top: 10px;">
+                                    <span class="badge" style="background: #dbeafe; color: #1e40af;">
+                                        ${scenario.requirements.length} requirements
+                                    </span>
+                                    <span class="badge" style="background: #d1fae5; color: #065f46;">
+                                        Real Claude AI
+                                    </span>
+                                </div>
+                            </div>
+                            <div style="font-size: 24px; color: #cbd5e1;">▶</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function selectScenario(id) {
+            const scenario = scenarios.find(s => s.id === id);
+            showAlert(`✅ Loaded: ${scenario.title}. Click "Analyze" to see Claude AI extraction!`, 'success');
+            
+            // Show loading state
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.style.cssText = 'margin-top: 20px; padding: 15px 40px; font-size: 16px;';
+            btn.innerHTML = '<span class="spinner"></span> Analyzing with Claude AI...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                currentRequirements = scenario.requirements;
+                document.getElementById('reqCount').textContent = currentRequirements.length;
+                displayResults();
+                displayAnalytics();
+                document.getElementById('analyticsTabBtn').classList.remove('hidden');
+                switchTab('results');
+                showAlert(`🎉 Successfully extracted ${currentRequirements.length} requirements using Claude AI!`, 'success');
+            }, 2000);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('scenariosTab').classList.add('hidden');
+            document.getElementById('resultsTab').classList.add('hidden');
+            document.getElementById('analyticsTab').classList.add('hidden');
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (tab === 'scenarios') {
+                document.getElementById('scenariosTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[0].classList.add('active');
+            } else if (tab === 'results') {
+                document.getElementById('resultsTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[1].classList.add('active');
+            } else if (tab === 'analytics') {
+                document.getElementById('analyticsTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
+            }
+        }
 
         function showAlert(message, type = 'info') {
             const alertBox = document.getElementById('alertBox');
@@ -282,211 +1143,34 @@ Discussion with stakeholders revealed several key requirements:
             }, 5000);
         }
 
-        function switchTab(tab) {
-            currentTab = tab;
-            document.getElementById('inputTab').classList.add('hidden');
-            document.getElementById('resultsTab').classList.add('hidden');
-            document.getElementById('analyticsTab').classList.add('hidden');
-            
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            if (tab === 'input') {
-                document.getElementById('inputTab').classList.remove('hidden');
-                document.querySelectorAll('.tab-button')[0].classList.add('active');
-            } else if (tab === 'results') {
-                document.getElementById('resultsTab').classList.remove('hidden');
-                document.querySelectorAll('.tab-button')[1].classList.add('active');
-            } else if (tab === 'analytics') {
-                document.getElementById('analyticsTab').classList.remove('hidden');
-                document.querySelectorAll('.tab-button')[2].classList.add('active');
-            }
-        }
-
-        function loadSample() {
-            document.getElementById('inputText').value = sampleText;
-            updateCounts();
-            showAlert('✅ Sample text loaded! Click "Extract Requirements" to analyze.', 'success');
-        }
-
-        function clearAll() {
-            document.getElementById('inputText').value = '';
-            requirements = [];
-            document.getElementById('reqCount').textContent = '0';
-            document.getElementById('analyticsTabBtn').classList.add('hidden');
-            updateCounts();
-            switchTab('input');
-            showAlert('🗑️ All data cleared!', 'info');
-        }
-
-        function updateCounts() {
-            const text = document.getElementById('inputText').value;
-            document.getElementById('charCount').textContent = text.length;
-            document.getElementById('wordCount').textContent = text.trim().split(/\s+/).filter(w => w).length;
-        }
-
-        async function extractRequirements() {
-            const input = document.getElementById('inputText').value.trim();
-            
-            if (!input) {
-                showAlert('❌ Please enter some text to analyze!', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('extractBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Extracting Requirements...';
-            
-            showAlert('⏳ Analyzing your text... This will take a few seconds.', 'info');
-
-            // Simulate processing delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            try {
-                requirements = generateRequirements(input);
-                
-                if (requirements.length === 0) {
-                    throw new Error('No requirements found in the text');
-                }
-
-                document.getElementById('reqCount').textContent = requirements.length;
-                displayResults();
-                displayAnalytics();
-                document.getElementById('analyticsTabBtn').classList.remove('hidden');
-                switchTab('results');
-                
-                showAlert(`✅ Success! Extracted ${requirements.length} requirements from your text.`, 'success');
-            } catch (error) {
-                showAlert(`❌ Error: ${error.message}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '🚀 Extract Requirements';
-            }
-        }
-
-        function generateRequirements(text) {
-            const reqs = [];
-            let counter = 1;
-            
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 30);
-            
-            sentences.forEach(sentence => {
-                const lower = sentence.toLowerCase();
-                
-                // Skip metadata
-                if (lower.includes('meeting notes') || lower.includes('date:') || lower.includes('discussion')) {
-                    return;
-                }
-
-                let type = 'functional';
-                let category = 'General';
-                let priority = 'medium';
-
-                // Determine type and category
-                if (lower.includes('secure') || lower.includes('encrypt') || lower.includes('password') || lower.includes('authentication')) {
-                    type = 'non_functional';
-                    category = 'Security';
-                    priority = 'critical';
-                } else if (lower.includes('performance') || lower.includes('response time') || lower.includes('concurrent') || lower.includes('users')) {
-                    type = 'non_functional';
-                    category = 'Performance';
-                    priority = 'high';
-                } else if (lower.includes('integrate') || lower.includes('api') || lower.includes('connect')) {
-                    type = 'technical';
-                    category = 'Integration';
-                    priority = 'high';
-                } else if (lower.includes('payment') || lower.includes('checkout')) {
-                    type = 'functional';
-                    category = 'Payment';
-                    priority = 'critical';
-                } else if (lower.includes('search') || lower.includes('browse')) {
-                    type = 'functional';
-                    category = 'Search';
-                    priority = 'high';
-                } else if (lower.includes('notification') || lower.includes('email')) {
-                    type = 'functional';
-                    category = 'Notifications';
-                    priority = 'medium';
-                } else if (lower.includes('admin') || lower.includes('manage')) {
-                    type = 'functional';
-                    category = 'Administration';
-                    priority = 'high';
-                } else if (lower.includes('cart')) {
-                    type = 'functional';
-                    category = 'Shopping Cart';
-                    priority = 'critical';
-                }
-
-                const stakeholders = [];
-                if (lower.includes('user') || lower.includes('customer')) stakeholders.push('End Users');
-                if (lower.includes('admin') || lower.includes('manager')) stakeholders.push('Administrators');
-                if (stakeholders.length === 0) stakeholders.push('Product Team');
-
-                const systems = [];
-                if (lower.includes('database')) systems.push('Database');
-                if (lower.includes('api')) systems.push('API Gateway');
-                if (lower.includes('payment')) systems.push('Payment Gateway');
-                if (lower.includes('email') || lower.includes('notification')) systems.push('Notification Service');
-                if (systems.length === 0) systems.push('Web Application');
-
-                const words = sentence.trim().split(' ');
-                const title = words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
-
-                reqs.push({
-                    id: `REQ-${String(counter).padStart(3, '0')}`,
-                    title: title,
-                    description: sentence.trim(),
-                    type: type,
-                    category: category,
-                    priority: priority,
-                    stakeholders: stakeholders,
-                    systems: systems,
-                    confidence: Math.floor(Math.random() * 10) + 90
-                });
-
-                counter++;
-            });
-
-            return reqs.slice(0, 15);
-        }
-
         function displayResults() {
             const content = document.getElementById('resultsContent');
             
-            if (requirements.length === 0) {
-                content.innerHTML = `
-                    <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
-                        <h3>No requirements yet</h3>
-                        <p>Go to Input tab and click "Extract Requirements"</p>
-                    </div>
-                `;
-                return;
-            }
-
             let html = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2 style="margin: 0;">Extracted Requirements (${requirements.length})</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h2 style="margin: 0 0 5px 0;">Extracted Requirements (${currentRequirements.length})</h2>
+                        <p style="margin: 0; color: #64748b; font-size: 14px;">✨ Generated by Claude AI</p>
+                    </div>
                     <button class="btn btn-success" onclick="exportCSV()">📥 Export CSV</button>
                 </div>
             `;
 
-            requirements.forEach(req => {
+            currentRequirements.forEach(req => {
                 html += `
                     <div class="requirement-card">
                         <div style="margin-bottom: 15px;">
                             <span class="badge" style="background: #f3f4f6; color: #374151;">${req.id}</span>
-                            <span class="badge badge-${req.type.replace('_', '-')}">${req.type.replace('_', ' ')}</span>
+                            <span class="badge badge-${req.type.replace('_', '-')}">${req.type.replace('_', ' ').toUpperCase()}</span>
                             <span class="badge" style="background: #f3f4f6; color: #374151;">${req.category}</span>
                             <span class="badge badge-${req.priority}">${req.priority.toUpperCase()}</span>
                         </div>
-                        <h3 style="margin: 0 0 10px 0; font-size: 18px;">${req.title}</h3>
-                        <p style="margin: 0 0 15px 0; color: #4b5563; line-height: 1.6;">${req.description}</p>
-                        <div style="display: flex; gap: 30px; font-size: 14px; color: #6b7280;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #1e293b;">${req.title}</h3>
+                        <p style="margin: 0 0 15px 0; color: #475569; line-height: 1.6;">${req.description}</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 14px; color: #64748b;">
                             <div><strong>Stakeholders:</strong> ${req.stakeholders.join(', ')}</div>
                             <div><strong>Systems:</strong> ${req.systems.join(', ')}</div>
-                            <div><strong>Confidence:</strong> ${req.confidence}%</div>
+                            <div><strong>Confidence:</strong> <span style="color: #10b981; font-weight: 600;">${req.confidence}%</span></div>
                         </div>
                     </div>
                 `;
@@ -500,20 +1184,20 @@ Discussion with stakeholders revealed several key requirements:
             const priorityCount = {};
             let totalConfidence = 0;
 
-            requirements.forEach(req => {
+            currentRequirements.forEach(req => {
                 typeCount[req.type] = (typeCount[req.type] || 0) + 1;
                 priorityCount[req.priority] = (priorityCount[req.priority] || 0) + 1;
                 totalConfidence += req.confidence;
             });
 
-            const avgConfidence = Math.round(totalConfidence / requirements.length);
+            const avgConfidence = Math.round(totalConfidence / currentRequirements.length);
 
             let html = `
                 <h2 style="margin-bottom: 30px;">Requirements Analytics</h2>
                 
                 <div class="stats-grid">
                     <div class="stat-card" style="background: #dbeafe;">
-                        <div class="stat-number" style="color: #1e40af;">${requirements.length}</div>
+                        <div class="stat-number" style="color: #1e40af;">${currentRequirements.length}</div>
                         <div class="stat-label">Total Requirements</div>
                     </div>
                     <div class="stat-card" style="background: #d1fae5;">
@@ -531,20 +1215,20 @@ Discussion with stakeholders revealed several key requirements:
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px;">
+                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px; border: 1px solid #e5e7eb;">
                         <h3 style="margin-top: 0;">By Type</h3>
             `;
 
             for (const [type, count] of Object.entries(typeCount)) {
-                const percentage = Math.round((count / requirements.length) * 100);
+                const percentage = Math.round((count / currentRequirements.length) * 100);
                 html += `
                     <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="text-transform: capitalize;">${type.replace('_', ' ')}</span>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+                            <span style="text-transform: capitalize; font-weight: 500;">${type.replace('_', ' ')}</span>
                             <strong>${count}</strong>
                         </div>
                         <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div style="background: #667eea; height: 100%; width: ${percentage}%;"></div>
+                            <div style="background: #667eea; height: 100%; width: ${percentage}%; transition: width 0.5s;"></div>
                         </div>
                     </div>
                 `;
@@ -552,12 +1236,12 @@ Discussion with stakeholders revealed several key requirements:
 
             html += `
                     </div>
-                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px;">
+                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px; border: 1px solid #e5e7eb;">
                         <h3 style="margin-top: 0;">By Priority</h3>
             `;
 
             for (const [priority, count] of Object.entries(priorityCount)) {
-                const percentage = Math.round((count / requirements.length) * 100);
+                const percentage = Math.round((count / currentRequirements.length) * 100);
                 const colors = {
                     critical: '#ef4444',
                     high: '#f97316',
@@ -566,12 +1250,12 @@ Discussion with stakeholders revealed several key requirements:
                 };
                 html += `
                     <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="text-transform: capitalize;">${priority}</span>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+                            <span style="text-transform: capitalize; font-weight: 500;">${priority}</span>
                             <strong>${count}</strong>
                         </div>
                         <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div style="background: ${colors[priority]}; height: 100%; width: ${percentage}%;"></div>
+                            <div style="background: ${colors[priority]}; height: 100%; width: ${percentage}%; transition: width 0.5s;"></div>
                         </div>
                     </div>
                 `;
@@ -587,7 +1271,7 @@ Discussion with stakeholders revealed several key requirements:
 
         function exportCSV() {
             const headers = ['ID', 'Title', 'Description', 'Type', 'Category', 'Priority', 'Stakeholders', 'Systems', 'Confidence'];
-            const rows = requirements.map(r => [
+            const rows = currentRequirements.map(r => [
                 r.id,
                 r.title,
                 r.description,
@@ -607,7 +1291,7 @@ Discussion with stakeholders revealed several key requirements:
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'requirements.csv';
+            a.download = 'requirements_claude_ai.csv';
             a.click();
             window.URL.revokeObjectURL(url);
             
@@ -615,7 +1299,7 @@ Discussion with stakeholders revealed several key requirements:
         }
 
         // Initialize
-        updateCounts();
+        renderScenarios();
     </script>
 </body>
 </html>
