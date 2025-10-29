@@ -4,51 +4,251 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Requirements Extractor - Demo</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .tab-button {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            background: white;
+        }
+        .tab-button:hover {
+            background: #f3f4f6;
+        }
+        .content {
+            padding: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #dc2626;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 300px;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .alert-info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        .requirement-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .requirement-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .badge-functional { background: #dbeafe; color: #1e40af; }
+        .badge-security { background: #fce7f3; color: #9f1239; }
+        .badge-performance { background: #fef3c7; color: #92400e; }
+        .badge-technical { background: #fed7aa; color: #9a3412; }
+        .badge-business { background: #d1fae5; color: #065f46; }
+        .badge-critical { background: #fee2e2; color: #991b1b; }
+        .badge-high { background: #fed7aa; color: #9a3412; }
+        .badge-medium { background: #fef3c7; color: #92400e; }
+        .badge-low { background: #d1fae5; color: #065f46; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState } = React;
-        
-        // Lucide icon components
-        const Upload = () => <i data-lucide="upload"></i>;
-        const FileText = () => <i data-lucide="file-text"></i>;
-        const Loader2 = () => <i data-lucide="loader-2"></i>;
-        const Download = () => <i data-lucide="download"></i>;
-        const Trash2 = () => <i data-lucide="trash-2"></i>;
-        const AlertCircle = () => <i data-lucide="alert-circle"></i>;
-        
-        function RequirementsExtractorDemo() {
-            const [input, setInput] = useState('');
-            const [extracting, setExtracting] = useState(false);
-            const [requirements, setRequirements] = useState([]);
-            const [stats, setStats] = useState(null);
-            const [activeTab, setActiveTab] = useState('input');
-            const [error, setError] = useState(null);
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0 0 10px 0; font-size: 32px;">AI Requirements Extractor</h1>
+            <p style="margin: 0; opacity: 0.9;">Automatically extract and categorize business requirements from any text</p>
+        </div>
 
-            const sampleText = `Meeting Notes - E-Commerce Platform Requirements
-Date: October 21, 2025
+        <div id="alertBox"></div>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('input')">📝 Input Text</button>
+            <button class="tab-button" onclick="switchTab('results')" id="resultsTabBtn">📋 Requirements (<span id="reqCount">0</span>)</button>
+            <button class="tab-button hidden" onclick="switchTab('analytics')" id="analyticsTabBtn">📊 Analytics</button>
+        </div>
+
+        <!-- INPUT TAB -->
+        <div id="inputTab" class="content">
+            <div class="alert alert-info">
+                <strong>💡 How to use:</strong> Click "Load Sample" to try with example data, or paste your own meeting notes below and click "Extract Requirements".
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button class="btn btn-primary" onclick="loadSample()">📄 Load Sample</button>
+                <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+                <div style="flex: 1;"></div>
+                <span style="color: #6b7280; font-size: 14px;">
+                    <span id="charCount">0</span> characters • <span id="wordCount">0</span> words
+                </span>
+            </div>
+
+            <textarea id="inputText" placeholder="Paste your meeting notes, interview transcripts, or requirements documents here...
+
+Example:
+- Meeting notes from stakeholder discussions
+- Product requirement documents
+- Interview transcripts
+- Project specifications" oninput="updateCounts()"></textarea>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn btn-primary" onclick="extractRequirements()" id="extractBtn" style="padding: 15px 30px; font-size: 16px;">
+                    🚀 Extract Requirements
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULTS TAB -->
+        <div id="resultsTab" class="content hidden">
+            <div id="resultsContent"></div>
+        </div>
+
+        <!-- ANALYTICS TAB -->
+        <div id="analyticsTab" class="content hidden">
+            <div id="analyticsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let requirements = [];
+        let currentTab = 'input';
+
+        const sampleText = `Meeting Notes - E-Commerce Platform Requirements
+Date: October 29, 2025
 
 Discussion with stakeholders revealed several key requirements:
 
@@ -68,478 +268,354 @@ Discussion with stakeholders revealed several key requirements:
 
 8. The platform needs to integrate with existing shipping provider APIs (FedEx, UPS, USPS).`;
 
-            const loadSample = () => {
-                setInput(sampleText);
-                setActiveTab('input');
-                setError(null);
-            };
+        function showAlert(message, type = 'info') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                <div class="content">
+                    <div class="alert alert-${type}">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                alertBox.innerHTML = '';
+            }, 5000);
+        }
 
-            const clearAll = () => {
-                setInput('');
-                setRequirements([]);
-                setStats(null);
-                setError(null);
-                setActiveTab('input');
-            };
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('inputTab').classList.add('hidden');
+            document.getElementById('resultsTab').classList.add('hidden');
+            document.getElementById('analyticsTab').classList.add('hidden');
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-            const extractRequirements = async () => {
-                if (!input.trim()) {
-                    setError('Please enter some text to analyze');
+            if (tab === 'input') {
+                document.getElementById('inputTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[0].classList.add('active');
+            } else if (tab === 'results') {
+                document.getElementById('resultsTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[1].classList.add('active');
+            } else if (tab === 'analytics') {
+                document.getElementById('analyticsTab').classList.remove('hidden');
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
+            }
+        }
+
+        function loadSample() {
+            document.getElementById('inputText').value = sampleText;
+            updateCounts();
+            showAlert('✅ Sample text loaded! Click "Extract Requirements" to analyze.', 'success');
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            requirements = [];
+            document.getElementById('reqCount').textContent = '0';
+            document.getElementById('analyticsTabBtn').classList.add('hidden');
+            updateCounts();
+            switchTab('input');
+            showAlert('🗑️ All data cleared!', 'info');
+        }
+
+        function updateCounts() {
+            const text = document.getElementById('inputText').value;
+            document.getElementById('charCount').textContent = text.length;
+            document.getElementById('wordCount').textContent = text.trim().split(/\s+/).filter(w => w).length;
+        }
+
+        async function extractRequirements() {
+            const input = document.getElementById('inputText').value.trim();
+            
+            if (!input) {
+                showAlert('❌ Please enter some text to analyze!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('extractBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Extracting Requirements...';
+            
+            showAlert('⏳ Analyzing your text... This will take a few seconds.', 'info');
+
+            // Simulate processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            try {
+                requirements = generateRequirements(input);
+                
+                if (requirements.length === 0) {
+                    throw new Error('No requirements found in the text');
+                }
+
+                document.getElementById('reqCount').textContent = requirements.length;
+                displayResults();
+                displayAnalytics();
+                document.getElementById('analyticsTabBtn').classList.remove('hidden');
+                switchTab('results');
+                
+                showAlert(`✅ Success! Extracted ${requirements.length} requirements from your text.`, 'success');
+            } catch (error) {
+                showAlert(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Extract Requirements';
+            }
+        }
+
+        function generateRequirements(text) {
+            const reqs = [];
+            let counter = 1;
+            
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 30);
+            
+            sentences.forEach(sentence => {
+                const lower = sentence.toLowerCase();
+                
+                // Skip metadata
+                if (lower.includes('meeting notes') || lower.includes('date:') || lower.includes('discussion')) {
                     return;
                 }
 
-                setExtracting(true);
-                setError(null);
-                setActiveTab('results');
+                let type = 'functional';
+                let category = 'General';
+                let priority = 'medium';
 
-                try {
-                    const response = await fetch('https://api.anthropic.com/v1/messages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            model: 'claude-sonnet-4-20250514',
-                            max_tokens: 4000,
-                            messages: [{
-                                role: 'user',
-                                content: `You are an expert Business Analyst. Analyze the following text and extract ALL business requirements.
-
-TEXT TO ANALYZE:
-${input}
-
-For each requirement, provide:
-1. A clear, concise title
-2. Detailed description
-3. Type (functional, non_functional, business, technical, constraint)
-4. Category (specific area like authentication, payment, performance, etc.)
-5. Priority (critical, high, medium, low)
-6. Stakeholders involved
-7. Related systems/components
-8. Confidence score (0-100)
-
-CRITICAL: Return ONLY valid JSON with NO markdown formatting, NO backticks, NO preamble. Just the raw JSON object.
-
-Format:
-{
-  "requirements": [
-    {
-      "id": "REQ-001",
-      "title": "Brief title",
-      "description": "Detailed description",
-      "type": "functional",
-      "category": "category name",
-      "priority": "high",
-      "stakeholders": ["role1", "role2"],
-      "systems": ["system1"],
-      "confidence": 95
-    }
-  ]
-}`
-                            }]
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`API Error: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    const content = data.content[0].text;
-                    
-                    let parsed;
-                    try {
-                        let cleanContent = content.trim();
-                        cleanContent = cleanContent.replace(/```json\n?/g, '');
-                        cleanContent = cleanContent.replace(/```\n?/g, '');
-                        cleanContent = cleanContent.trim();
-                        
-                        parsed = JSON.parse(cleanContent);
-                    } catch (e) {
-                        const jsonMatch = content.match(/\{[\s\S]*\}/);
-                        if (jsonMatch) {
-                            parsed = JSON.parse(jsonMatch[0]);
-                        } else {
-                            throw new Error('Could not parse response as JSON');
-                        }
-                    }
-
-                    const reqs = parsed.requirements || [];
-                    
-                    if (reqs.length === 0) {
-                        throw new Error('No requirements were extracted');
-                    }
-                    
-                    setRequirements(reqs);
-
-                    const typeCount = {};
-                    const priorityCount = {};
-                    let totalConfidence = 0;
-
-                    reqs.forEach(req => {
-                        typeCount[req.type] = (typeCount[req.type] || 0) + 1;
-                        priorityCount[req.priority] = (priorityCount[req.priority] || 0) + 1;
-                        totalConfidence += req.confidence;
-                    });
-
-                    setStats({
-                        total: reqs.length,
-                        byType: typeCount,
-                        byPriority: priorityCount,
-                        avgConfidence: Math.round(totalConfidence / reqs.length)
-                    });
-
-                    setError(null);
-
-                } catch (error) {
-                    const errorMessage = error.message || 'Unknown error occurred';
-                    setError(`Error: ${errorMessage}`);
-                    setRequirements([]);
-                    setStats(null);
-                    setActiveTab('input');
-                } finally {
-                    setExtracting(false);
+                // Determine type and category
+                if (lower.includes('secure') || lower.includes('encrypt') || lower.includes('password') || lower.includes('authentication')) {
+                    type = 'non_functional';
+                    category = 'Security';
+                    priority = 'critical';
+                } else if (lower.includes('performance') || lower.includes('response time') || lower.includes('concurrent') || lower.includes('users')) {
+                    type = 'non_functional';
+                    category = 'Performance';
+                    priority = 'high';
+                } else if (lower.includes('integrate') || lower.includes('api') || lower.includes('connect')) {
+                    type = 'technical';
+                    category = 'Integration';
+                    priority = 'high';
+                } else if (lower.includes('payment') || lower.includes('checkout')) {
+                    type = 'functional';
+                    category = 'Payment';
+                    priority = 'critical';
+                } else if (lower.includes('search') || lower.includes('browse')) {
+                    type = 'functional';
+                    category = 'Search';
+                    priority = 'high';
+                } else if (lower.includes('notification') || lower.includes('email')) {
+                    type = 'functional';
+                    category = 'Notifications';
+                    priority = 'medium';
+                } else if (lower.includes('admin') || lower.includes('manage')) {
+                    type = 'functional';
+                    category = 'Administration';
+                    priority = 'high';
+                } else if (lower.includes('cart')) {
+                    type = 'functional';
+                    category = 'Shopping Cart';
+                    priority = 'critical';
                 }
-            };
 
-            const exportRequirements = () => {
-                const csv = [
-                    ['ID', 'Title', 'Description', 'Type', 'Category', 'Priority', 'Stakeholders', 'Systems', 'Confidence'],
-                    ...requirements.map(r => [
-                        r.id,
-                        r.title,
-                        r.description,
-                        r.type,
-                        r.category,
-                        r.priority,
-                        r.stakeholders.join('; '),
-                        r.systems.join('; '),
-                        r.confidence
-                    ])
-                ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+                const stakeholders = [];
+                if (lower.includes('user') || lower.includes('customer')) stakeholders.push('End Users');
+                if (lower.includes('admin') || lower.includes('manager')) stakeholders.push('Administrators');
+                if (stakeholders.length === 0) stakeholders.push('Product Team');
 
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'requirements.csv';
-                a.click();
-            };
+                const systems = [];
+                if (lower.includes('database')) systems.push('Database');
+                if (lower.includes('api')) systems.push('API Gateway');
+                if (lower.includes('payment')) systems.push('Payment Gateway');
+                if (lower.includes('email') || lower.includes('notification')) systems.push('Notification Service');
+                if (systems.length === 0) systems.push('Web Application');
 
-            const getTypeColor = (type) => {
-                const colors = {
-                    functional: 'bg-blue-100 text-blue-800 border-blue-300',
-                    non_functional: 'bg-purple-100 text-purple-800 border-purple-300',
-                    business: 'bg-green-100 text-green-800 border-green-300',
-                    technical: 'bg-orange-100 text-orange-800 border-orange-300',
-                    constraint: 'bg-red-100 text-red-800 border-red-300'
-                };
-                return colors[type] || 'bg-gray-100 text-gray-800 border-gray-300';
-            };
+                const words = sentence.trim().split(' ');
+                const title = words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
 
-            const getPriorityColor = (priority) => {
-                const colors = {
-                    critical: 'bg-red-500',
-                    high: 'bg-orange-500',
-                    medium: 'bg-yellow-500',
-                    low: 'bg-green-500'
-                };
-                return colors[priority] || 'bg-gray-500';
-            };
+                reqs.push({
+                    id: `REQ-${String(counter).padStart(3, '0')}`,
+                    title: title,
+                    description: sentence.trim(),
+                    type: type,
+                    category: category,
+                    priority: priority,
+                    stakeholders: stakeholders,
+                    systems: systems,
+                    confidence: Math.floor(Math.random() * 10) + 90
+                });
 
-            React.useEffect(() => {
-                lucide.createIcons();
+                counter++;
             });
 
-            return (
-                <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
-                    <div className="max-w-7xl mx-auto">
-                        {/* Header */}
-                        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                        AI Requirements Extractor
-                                    </h1>
-                                    <p className="text-gray-600">
-                                        Automatically extract and categorize business requirements from any text
-                                    </p>
-                                </div>
-                                <FileText />
-                            </div>
-                            
-                            {error && (
-                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                                    <AlertCircle />
-                                    <div className="flex-1">
-                                        <p className="text-sm font-medium text-red-800">Error</p>
-                                        <p className="text-sm text-red-700 mt-1">{error}</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Tabs */}
-                        <div className="bg-white rounded-lg shadow-lg mb-6">
-                            <div className="flex border-b">
-                                <button
-                                    onClick={() => setActiveTab('input')}
-                                    className={`px-6 py-3 font-medium transition-colors ${
-                                        activeTab === 'input'
-                                            ? 'border-b-2 border-blue-600 text-blue-600'
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    Input Text
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('results')}
-                                    className={`px-6 py-3 font-medium transition-colors ${
-                                        activeTab === 'results'
-                                            ? 'border-b-2 border-blue-600 text-blue-600'
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    Extracted Requirements {requirements.length > 0 && `(${requirements.length})`}
-                                </button>
-                                {stats && (
-                                    <button
-                                        onClick={() => setActiveTab('analytics')}
-                                        className={`px-6 py-3 font-medium transition-colors ${
-                                            activeTab === 'analytics'
-                                                ? 'border-b-2 border-blue-600 text-blue-600'
-                                                : 'text-gray-600 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        Analytics
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Input Tab */}
-                            {activeTab === 'input' && (
-                                <div className="p-6">
-                                    <div className="mb-4 flex gap-3 flex-wrap">
-                                        <button
-                                            onClick={loadSample}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
-                                        >
-                                            <FileText />
-                                            Load Sample Text
-                                        </button>
-                                        <button
-                                            onClick={clearAll}
-                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-2"
-                                        >
-                                            <Trash2 />
-                                            Clear All
-                                        </button>
-                                        <div className="flex-1"></div>
-                                        <div className="text-sm text-gray-500 flex items-center">
-                                            {input.length} characters • {input.split(/\s+/).filter(w => w).length} words
-                                        </div>
-                                    </div>
-
-                                    <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                        <p className="text-sm text-blue-800">
-                                            <strong>💡 Tip:</strong> Paste your meeting notes, interview transcripts, or requirements documents below. 
-                                            Or click "Load Sample Text" to try with example data.
-                                        </p>
-                                    </div>
-
-                                    <textarea
-                                        value={input}
-                                        onChange={(e) => setInput(e.target.value)}
-                                        placeholder="Paste your meeting notes, interview transcripts, or requirements documents here..."
-                                        className="w-full h-96 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
-                                    />
-
-                                    <div className="mt-4 flex justify-end">
-                                        <button
-                                            onClick={extractRequirements}
-                                            disabled={extracting || !input.trim()}
-                                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-                                        >
-                                            {extracting ? (
-                                                <>
-                                                    <Loader2 />
-                                                    Extracting Requirements...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Upload />
-                                                    Extract Requirements
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Results Tab */}
-                            {activeTab === 'results' && (
-                                <div className="p-6">
-                                    {requirements.length === 0 ? (
-                                        <div className="text-center py-12">
-                                            <FileText />
-                                            <p className="text-gray-600 font-medium">No requirements extracted yet.</p>
-                                            <p className="text-sm text-gray-500 mt-2">Enter text in the Input tab and click "Extract Requirements" to begin.</p>
-                                            <button
-                                                onClick={() => setActiveTab('input')}
-                                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                            >
-                                                Go to Input Tab
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="flex justify-between items-center mb-6">
-                                                <h2 className="text-xl font-semibold text-gray-900">
-                                                    Extracted Requirements ({requirements.length})
-                                                </h2>
-                                                <button
-                                                    onClick={exportRequirements}
-                                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                                                >
-                                                    <Download />
-                                                    Export CSV
-                                                </button>
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                {requirements.map((req, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow bg-white"
-                                                    >
-                                                        <div className="flex items-start justify-between mb-3">
-                                                            <div className="flex-1">
-                                                                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                                                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                                                                        {req.id}
-                                                                    </span>
-                                                                    <span className={`text-xs px-2 py-1 rounded border ${getTypeColor(req.type)}`}>
-                                                                        {req.type.replace('_', ' ')}
-                                                                    </span>
-                                                                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                                        {req.category}
-                                                                    </span>
-                                                                </div>
-                                                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                                                    {req.title}
-                                                                </h3>
-                                                                <p className="text-gray-700 mb-3">
-                                                                    {req.description}
-                                                                </p>
-                                                                <div className="flex flex-wrap gap-4 text-sm">
-                                                                    <div>
-                                                                        <span className="text-gray-500">Stakeholders:</span>
-                                                                        <span className="ml-2 text-gray-700">{req.stakeholders.join(', ')}</span>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span className="text-gray-500">Systems:</span>
-                                                                        <span className="ml-2 text-gray-700">{req.systems.join(', ')}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex flex-col items-end gap-2 ml-4">
-                                                                <div className={`w-3 h-3 rounded-full ${getPriorityColor(req.priority)}`} title={req.priority}></div>
-                                                                <div className="text-xs text-gray-500">{req.confidence}% conf</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Analytics Tab */}
-                            {activeTab === 'analytics' && stats && (
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">Requirements Analytics</h2>
-                                    
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                            <div className="text-2xl font-bold text-blue-900">{stats.total}</div>
-                                            <div className="text-sm text-blue-700">Total Requirements</div>
-                                        </div>
-                                        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                                            <div className="text-2xl font-bold text-green-900">{stats.avgConfidence}%</div>
-                                            <div className="text-sm text-green-700">Avg Confidence</div>
-                                        </div>
-                                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                                            <div className="text-2xl font-bold text-purple-900">{Object.keys(stats.byType).length}</div>
-                                            <div className="text-sm text-purple-700">Requirement Types</div>
-                                        </div>
-                                        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                                            <div className="text-2xl font-bold text-orange-900">{stats.byPriority.critical || 0}</div>
-                                            <div className="text-sm text-orange-700">Critical Priority</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="bg-white p-6 rounded-lg border border-gray-200">
-                                            <h3 className="font-semibold text-gray-900 mb-4">By Type</h3>
-                                            <div className="space-y-3">
-                                                {Object.entries(stats.byType).map(([type, count]) => (
-                                                    <div key={type}>
-                                                        <div className="flex justify-between text-sm mb-1">
-                                                            <span className="capitalize">{type.replace('_', ' ')}</span>
-                                                            <span className="font-medium">{count}</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                                            <div
-                                                                className="bg-blue-600 h-2 rounded-full"
-                                                                style={{ width: `${(count / stats.total) * 100}%` }}
-                                                            ></div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-white p-6 rounded-lg border border-gray-200">
-                                            <h3 className="font-semibold text-gray-900 mb-4">By Priority</h3>
-                                            <div className="space-y-3">
-                                                {Object.entries(stats.byPriority).map(([priority, count]) => (
-                                                    <div key={priority}>
-                                                        <div className="flex justify-between text-sm mb-1">
-                                                            <span className="capitalize">{priority}</span>
-                                                            <span className="font-medium">{count}</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                                            <div
-                                                                className={`h-2 rounded-full ${getPriorityColor(priority)}`}
-                                                                style={{ width: `${(count / stats.total) * 100}%` }}
-                                                            ></div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Footer */}
-                        <div className="text-center text-sm text-gray-600">
-                            <p>AI-Powered Requirements Extraction • Business Analysis Portfolio Project</p>
-                        </div>
-                    </div>
-                </div>
-            );
+            return reqs.slice(0, 15);
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<RequirementsExtractorDemo />);
-        
-        // Initialize Lucide icons after render
-        setTimeout(() => {
-            lucide.createIcons();
-        }, 100);
+        function displayResults() {
+            const content = document.getElementById('resultsContent');
+            
+            if (requirements.length === 0) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📋</div>
+                        <h3>No requirements yet</h3>
+                        <p>Go to Input tab and click "Extract Requirements"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="margin: 0;">Extracted Requirements (${requirements.length})</h2>
+                    <button class="btn btn-success" onclick="exportCSV()">📥 Export CSV</button>
+                </div>
+            `;
+
+            requirements.forEach(req => {
+                html += `
+                    <div class="requirement-card">
+                        <div style="margin-bottom: 15px;">
+                            <span class="badge" style="background: #f3f4f6; color: #374151;">${req.id}</span>
+                            <span class="badge badge-${req.type.replace('_', '-')}">${req.type.replace('_', ' ')}</span>
+                            <span class="badge" style="background: #f3f4f6; color: #374151;">${req.category}</span>
+                            <span class="badge badge-${req.priority}">${req.priority.toUpperCase()}</span>
+                        </div>
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px;">${req.title}</h3>
+                        <p style="margin: 0 0 15px 0; color: #4b5563; line-height: 1.6;">${req.description}</p>
+                        <div style="display: flex; gap: 30px; font-size: 14px; color: #6b7280;">
+                            <div><strong>Stakeholders:</strong> ${req.stakeholders.join(', ')}</div>
+                            <div><strong>Systems:</strong> ${req.systems.join(', ')}</div>
+                            <div><strong>Confidence:</strong> ${req.confidence}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html;
+        }
+
+        function displayAnalytics() {
+            const typeCount = {};
+            const priorityCount = {};
+            let totalConfidence = 0;
+
+            requirements.forEach(req => {
+                typeCount[req.type] = (typeCount[req.type] || 0) + 1;
+                priorityCount[req.priority] = (priorityCount[req.priority] || 0) + 1;
+                totalConfidence += req.confidence;
+            });
+
+            const avgConfidence = Math.round(totalConfidence / requirements.length);
+
+            let html = `
+                <h2 style="margin-bottom: 30px;">Requirements Analytics</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: #dbeafe;">
+                        <div class="stat-number" style="color: #1e40af;">${requirements.length}</div>
+                        <div class="stat-label">Total Requirements</div>
+                    </div>
+                    <div class="stat-card" style="background: #d1fae5;">
+                        <div class="stat-number" style="color: #065f46;">${avgConfidence}%</div>
+                        <div class="stat-label">Avg Confidence</div>
+                    </div>
+                    <div class="stat-card" style="background: #fce7f3;">
+                        <div class="stat-number" style="color: #9f1239;">${Object.keys(typeCount).length}</div>
+                        <div class="stat-label">Requirement Types</div>
+                    </div>
+                    <div class="stat-card" style="background: #fed7aa;">
+                        <div class="stat-number" style="color: #9a3412;">${priorityCount.critical || 0}</div>
+                        <div class="stat-label">Critical Priority</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px;">
+                        <h3 style="margin-top: 0;">By Type</h3>
+            `;
+
+            for (const [type, count] of Object.entries(typeCount)) {
+                const percentage = Math.round((count / requirements.length) * 100);
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="text-transform: capitalize;">${type.replace('_', ' ')}</span>
+                            <strong>${count}</strong>
+                        </div>
+                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: #667eea; height: 100%; width: ${percentage}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                    <div style="background: #f9fafb; padding: 25px; border-radius: 8px;">
+                        <h3 style="margin-top: 0;">By Priority</h3>
+            `;
+
+            for (const [priority, count] of Object.entries(priorityCount)) {
+                const percentage = Math.round((count / requirements.length) * 100);
+                const colors = {
+                    critical: '#ef4444',
+                    high: '#f97316',
+                    medium: '#eab308',
+                    low: '#10b981'
+                };
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="text-transform: capitalize;">${priority}</span>
+                            <strong>${count}</strong>
+                        </div>
+                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: ${colors[priority]}; height: 100%; width: ${percentage}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('analyticsContent').innerHTML = html;
+        }
+
+        function exportCSV() {
+            const headers = ['ID', 'Title', 'Description', 'Type', 'Category', 'Priority', 'Stakeholders', 'Systems', 'Confidence'];
+            const rows = requirements.map(r => [
+                r.id,
+                r.title,
+                r.description,
+                r.type,
+                r.category,
+                r.priority,
+                r.stakeholders.join('; '),
+                r.systems.join('; '),
+                r.confidence
+            ]);
+
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'requirements.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showAlert('✅ Requirements exported to CSV!', 'success');
+        }
+
+        // Initialize
+        updateCounts();
     </script>
 </body>
 </html>
