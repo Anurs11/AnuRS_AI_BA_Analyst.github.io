@@ -2,7 +2,9 @@
 AI-Enhanced Business Analysis Portfolio - First of its kind BY Anu RS - 10/23/2025
 
 **Project 1:** **AI-Powered Requirements Extraction Tool**
+
 Business Problem: Manual requirements gathering from stakeholder interviews and documents is time- consuming and prone to missing implicit needs.
+
 AI Solution Implementation:
 1. Data Collection
 Gather 20-30 sample stakeholder interview transcripts (create realistic examples or use public datasets)
@@ -14,8 +16,5 @@ Create a classification model to categorize requirements (functional, non-functi
 3. Process Improvement Metrics
 Time reduction: 60% faster requirements extraction
 Completeness: 25% more requirements identified through AI pattern recognition Consistency: Standardized requirement format across all documents
- 4. Portfolio Deliverables
-GitHub repository with code and documentation Before/after comparison dashboard
-Case study write-up (2-3 pages)
-Demo video (3-5 minutes)
+
 Skills Demonstrated: NLP, Requirements Engineering, Process Automation, Python, API Integration
