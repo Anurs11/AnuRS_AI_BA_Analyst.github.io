@@ -1,6 +1,7 @@
 # ARS_AI_BA_Analyst.github.io
 AI-Enhanced Business Analysis Portfolio - First of its kind BY Anu RS - 10/23/2025
-Project 1: AI-Powered Requirements Extraction Tool
+
+**Project 1:** **AI-Powered Requirements Extraction Tool**
 Business Problem: Manual requirements gathering from stakeholder interviews and documents is time- consuming and prone to missing implicit needs.
 AI Solution Implementation:
 1. Data Collection
