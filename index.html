@@ -1,1 +1,661 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Anu RS | AI-Enhanced Business Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --gray: #6b7280;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .hero .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: var(--white);
+            padding: 3rem 2rem;
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            font-size: 1.125rem;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 4rem;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--dark);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .project-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 3rem;
+        }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .project-description {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .project-metrics {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .metric {
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: var(--light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .project-link {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .project-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Impact Section */
+        .impact {
+            background: var(--light);
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .impact-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .impact-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .impact-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .impact-label {
+            color: var(--gray);
+        }
+
+        /* Contact Section */
+        .contact {
+            background: var(--dark);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .contact h2 {
+            color: var(--white);
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.125rem;
+            transition: color 0.3s;
+        }
+
+        .contact-link:hover {
+            color: var(--secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: #111827;
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.25rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Anu RS</div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#impact">Impact</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Transforming Business Analysis with AI</h1>
+            <p class="subtitle">Business Analyst | AI Process Automation Specialist</p>
+            <p class="tagline">Building intelligent tools that make Business Analysts 10x more effective through AI-powered automation</p>
+            <div class="cta-buttons">
+                <a href="#projects" class="btn btn-primary">View Projects</a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <div class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">60%</span>
+                <span class="stat-label">Time Reduction in Requirements Gathering</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">5</span>
+                <span class="stat-label">AI-Powered BA Tools Built</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">$36K</span>
+                <span class="stat-label">Annual Value Created Per Analyst</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">92%</span>
+                <span class="stat-label">Average Classification Accuracy</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="section-header">
+            <h2>About Me</h2>
+            <p>Bridging Business Analysis and Artificial Intelligence</p>
+        </div>
+        <div class="about-content">
+            <div class="about-image">👩‍💻</div>
+            <div>
+                <p style="margin-bottom: 1rem; font-size: 1.125rem;">
+                    I'm a Business Intelligence Analyst who specializes in AI-driven process improvement. While most BAs are still doing manual requirements documentation, I'm building intelligent systems that automate the tedious parts of our job.
+                </p>
+                <p style="margin-bottom: 1rem; color: var(--gray);">
+                    My mission: Show that AI doesn't replace Business Analysts—it makes us 10x more effective by handling repetitive tasks, allowing us to focus on strategic thinking, stakeholder relationships, and complex problem-solving.
+                </p>
+                <p style="margin-bottom: 1.5rem; color: var(--gray);">
+                    Each project in my portfolio demonstrates measurable improvements: 40-80% time savings, higher quality outputs, and quantified business value.
+                </p>
+                <h3 style="margin-bottom: 1rem;">Technical Skills</h3>
+                <div class="skills">
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">Claude API</span>
+                    <span class="skill-tag">GPT-4</span>
+                    <span class="skill-tag">React</span>
+                    <span class="skill-tag">FastAPI</span>
+                    <span class="skill-tag">PostgreSQL</span>
+                    <span class="skill-tag">NLP</span>
+                    <span class="skill-tag">Machine Learning</span>
+                    <span class="skill-tag">Business Intelligence</span>
+                    <span class="skill-tag">Requirements Engineering</span>
+                    <span class="skill-tag">Process Mining</span>
+                    <span class="skill-tag">Data Analysis</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="section-header">
+            <h2>AI-Enhanced BA Projects</h2>
+            <p>Practical tools that transform traditional Business Analysis workflows</p>
+        </div>
+        <div class="projects-grid">
+            <!-- Project 1 - LIVE -->
+            <div class="project-card">
+                <div class="project-image">📋</div>
+                <div class="project-content">
+                    <h3 class="project-title">AI Requirements Extractor</h3>
+                    <p class="project-description">
+                        Automatically extracts, categorizes, and structures business requirements from unstructured documents using Claude API and NLP.
+                    </p>
+                    <div class="project-metrics">
+                        <span class="metric">60% Time Saved</span>
+                        <span class="metric">92% Accuracy</span>
+                        <span class="metric">25% More Complete</span>
+                    </div>
+                    <div class="project-tags">
+                        <span class="tag">Claude API</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">React</span>
+                        <span class="tag">NLP</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="projects/requirements-extractor.html" class="project-link">View Premium Demo →</a>
+                        <a href="projects/requirements-extractor-live.html" class="project-link">Try your own text →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2 - COMING SOON -->
+            <div class="project-card" style="opacity: 0.7;">
+                <div class="project-image" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">🔮</div>
+                <div class="project-content">
+                    <h3 class="project-title" style="color: #f59e0b; font-size: 1.25rem;">COMING SOON</h3>
+                    <p class="project-description">
+                        AI-powered automation for business intelligence and analytics workflows.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Project 3 - COMING SOON -->
+            <div class="project-card" style="opacity: 0.7;">
+                <div class="project-image" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">🔮</div>
+                <div class="project-content">
+                    <h3 class="project-title" style="color: #f59e0b; font-size: 1.25rem;">COMING SOON</h3>
+                    <p class="project-description">
+                        Intelligent process mining and optimization for business workflows.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Project 4 - COMING SOON -->
+            <div class="project-card" style="opacity: 0.7;">
+                <div class="project-image" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">🔮</div>
+                <div class="project-content">
+                    <h3 class="project-title" style="color: #f59e0b; font-size: 1.25rem;">COMING SOON</h3>
+                    <p class="project-description">
+                        AI assistant for stakeholder communication analysis and management.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Project 5 - COMING SOON -->
+            <div class="project-card" style="opacity: 0.7;">
+                <div class="project-image" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">🔮</div>
+                <div class="project-content">
+                    <h3 class="project-title" style="color: #f59e0b; font-size: 1.25rem;">COMING SOON</h3>
+                    <p class="project-description">
+                        Automated test case generation from requirements and user stories.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Project 6 - COMING SOON -->
+            <div class="project-card" style="opacity: 0.7;">
+                <div class="project-image" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">🔮</div>
+                <div class="project-content">
+                    <h3 class="project-title" style="color: #f59e0b; font-size: 1.25rem;">COMING SOON</h3>
+                    <p class="project-description">
+                        AI-powered tool for generating user stories from business objectives.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact" class="impact">
+        <div class="section-header">
+            <h2>Measurable Business Impact</h2>
+            <p>Quantified results across all portfolio projects</p>
+        </div>
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-icon">⏱️</div>
+                <div class="impact-value">200+</div>
+                <div class="impact-label">Hours Saved Annually Per BA</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon">💰</div>
+                <div class="impact-value">$36K</div>
+                <div class="impact-label">Annual Value Created</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon">📈</div>
+                <div class="impact-value">40-80%</div>
+                <div class="impact-label">Average Efficiency Gain</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon">✨</div>
+                <div class="impact-value">25%</div>
+                <div class="impact-label">Quality Improvement</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="section-header">
+            <h2>Let's Connect</h2>
+            <p style="color: rgba(255,255,255,0.8);">Interested in AI-enhanced Business Analysis? Let's talk.</p>
+        </div>
+        <div class="contact-links">
+            <a href="mailto:anooradha.sv@gmail.com" class="contact-link">
+                <span>📧</span> Email
+            </a>
+            <a href="https://linkedin.com/in/anu-rs-profile" class="contact-link" target="_blank">
+                <span>💼</span> LinkedIn
+            </a>
+            <a href="https://github.com/AnuRS11" class="contact-link" target="_blank">
+                <span>💻</span> GitHub
+            </a>
+            <a href="https://medium.com/@yourusername" class="contact-link" target="_blank">
+                <span>✍️</span> Medium
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Anu RS. All rights reserved. | Built with HTML, CSS, and a passion for AI-enhanced Business Analysis</p>
+    </footer>
+</body>
+</html>
+
